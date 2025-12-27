@@ -22,14 +22,28 @@ def load_source_data_to_gcs(
     default="ALL",
     help="Source of health data (defaults to ALL)",
 )
-def main(source: str):
+@click.option("--debug", is_flag=True, help="Enable debug logging")
+def main(source: str, debug: bool):
+    """
+    Depending on the user's input, loads health data from various sources
+    from Google Drive into Google Cloud Storage, and then into BigQuery.
+
+    Args:
+        source (str): The source of health data to load (e.g., 'FITBIT', 'APPLE_HEALTH', or 'ALL').
+        debug (bool): Flag to enable debug logging
+    """
+
+    if debug:
+        logger.setLevel("DEBUG")
+        logger.debug("** Debugger Active **")
 
     drive_client = None  # Placeholder for Drive client initialization
     storage_client = storage.Client()
 
-    source = source.strip().upper()
     load_source_data_to_gcs(
-        source=source, drive_client=drive_client, storage_client=storage_client
+        source=source.strip().upper(),
+        drive_client=drive_client,
+        storage_client=storage_client,
     )
 
 
