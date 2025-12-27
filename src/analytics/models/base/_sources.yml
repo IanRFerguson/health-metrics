@@ -1,0 +1,4 @@
+sources:
+  - name: health
+    tables:
+      - food_diary_2026

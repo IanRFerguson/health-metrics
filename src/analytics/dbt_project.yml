@@ -1,0 +1,36 @@
+name: 'food_diary_2026'
+version: '1.0.0'
+
+profile: 'dev'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:     
+  - "target"
+  - "dbt_packages"
+
+models:
+  food_diary_2026:
+    +persist_docs:
+      +persist_docs:
+      relation: true
+      columns: true
+    +submission_method: serverless
+    +materialized: table
+
+    # Layer-specific overrides
+    base:
+      +schema: base
+      +materialized: view
+
+    staging:
+      +schema: staging
+
+    analytics:
+      machine_learning:
+        +tags: ["machine_learning"]
+        +schema: ml
+      +schema: analytics
+  
