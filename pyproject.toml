@@ -1,5 +1,5 @@
 [project]
-dependencies = ["dbt-bigquery==1.8.0", "klondike"]
+dependencies = ["dbt-bigquery==1.8.0", "klondike", "click==8.3.1", "PyDrive2"]
 name = "health-metrics"
 version = "0.1.0"
 
