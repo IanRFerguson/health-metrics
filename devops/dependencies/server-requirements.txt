@@ -1,0 +1,7 @@
+klondike
+click==8.3.1
+flask==3.1.2
+gunicorn
+colorlog
+google-cloud-storage
+pandas

@@ -4,6 +4,7 @@
 
 **/*.tfstate*
 **/*.terraform*
+.local/*.env
 infra/out
 build/
 **.egg-info
