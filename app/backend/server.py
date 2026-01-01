@@ -1,6 +1,7 @@
 from flask import Flask
 from routes.api import bp as api_blueprint
 from routes.webhook import bp as webhook_blueprint
+
 from common.logger import logger
 
 #####

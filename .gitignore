@@ -1,6 +1,7 @@
 .venv/
 **/logs/
 **/service_accounts/*.json
+data_dev/
 
 **/*.tfstate*
 **/*.terraform*

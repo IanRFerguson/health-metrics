@@ -9,3 +9,4 @@ services:
       - .local/server.env
     volumes:
       - ./service_accounts:/app/service_accounts:ro
+      - ./data_dev:/tmp
