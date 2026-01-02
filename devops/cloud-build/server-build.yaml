@@ -4,7 +4,7 @@
     args: 
     - 'build'
     - '-t' 
-    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest:$COMMIT_SHA' 
+    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:$COMMIT_SHA' 
     - '-t'
     - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest'
     - '-f'
@@ -13,7 +13,7 @@
   
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest:$COMMIT_SHA']
+    args: ['push', 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:$COMMIT_SHA']
 
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest']
@@ -26,12 +26,12 @@
     - 'deploy'
     - 'health-metrics-app-service'
     - '--image'
-    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest:$COMMIT_SHA'
+    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:$COMMIT_SHA'
     - '--region'
     - 'us-central1'
   
   images:
-  - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:$COMMIT_SHA'
   - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest'
   
   options:
