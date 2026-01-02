@@ -41,7 +41,7 @@ def load_source_data(
 )
 @click.option("--debug", is_flag=True, help="Enable debug logging")
 @click.option("--quiet", is_flag=True, help="Disable all logs")
-def main(source: str, debug: bool):
+def main(source: str, debug: bool, quiet: bool):
     """
     Depending on the user's input, loads health data from various sources
     from Google Drive into Google Cloud Storage, and then into BigQuery.
@@ -49,9 +49,12 @@ def main(source: str, debug: bool):
     Args:
         source (str): The source of health data to load (e.g., 'WORKOUTS', 'HEALTH', or 'ALL').
         debug (bool): Flag to enable debug logging
+        quiet (bool): Flag to disable all logging
     """
 
-    if debug or os.environ["STAGE"] != "production":
+    if quiet:
+        logger.setLevel("WARNING")
+    elif debug or os.environ["STAGE"] != "production":
         logger.setLevel("DEBUG")
         logger.debug("** Debugger Active **")
 
