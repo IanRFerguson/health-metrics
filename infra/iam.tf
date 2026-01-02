@@ -3,6 +3,7 @@ locals {
     "storage.objectUser",
     "bigquery.dataEditor",
     "bigquery.jobUser",
+    "cloudbuild.builds.editor"
   ]
 }
 
