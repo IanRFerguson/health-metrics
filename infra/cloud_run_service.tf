@@ -47,3 +47,13 @@ resource "google_cloud_run_v2_service" "health_metrics_app" {
     }
   }
 }
+
+resource "google_cloud_run_service_iam_binding" "health_metrics_app_invoker" {
+  location = google_cloud_run_v2_service.health_metrics_app.location
+  service  = google_cloud_run_v2_service.health_metrics_app.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers",
+  ]
+}
+
