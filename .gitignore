@@ -5,7 +5,7 @@ data_dev/
 
 **/*.tfstate*
 **/*.terraform*
-.local/*.env
+**/*.env
 infra/out
 build/
 **.egg-info
