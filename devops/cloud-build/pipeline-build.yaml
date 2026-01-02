@@ -1,0 +1,39 @@
+  steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+    - 'build'
+    - '-t' 
+    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:$COMMIT_SHA' 
+    - '-t'
+    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest'
+    - '-f'
+    - 'devops/docker/Dockerfile.pipeline'
+    - '.'
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest']
+  
+  # Deploy container image to Cloud Run Job
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'jobs'
+    - 'update'
+    - 'load-job'
+    - '--image'
+    - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:$COMMIT_SHA'
+    - '--region'
+    - 'us-central1'
+  
+  images:
+  - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest'
+  
+  options:
+    logging: CLOUD_LOGGING_ONLY 
