@@ -19,3 +19,13 @@ server-docker-push:
 
 pipeline:
 	@docker compose up pipeline-load --build
+
+
+pipeline-docker-push:
+	@docker build \
+		-t us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest \
+		-f ./devops/docker/Dockerfile.elt \
+		--platform linux/amd64 \
+		.
+
+	@docker push us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest

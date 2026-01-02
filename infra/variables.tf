@@ -5,4 +5,5 @@ variable "GCS_BUCKET_NAME" {
 variable "WEBHOOK_API_KEY" {
   description = "API key for securing webhook endpoints."
   type        = string
+  sensitive   = true
 }
