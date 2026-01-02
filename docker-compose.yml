@@ -10,3 +10,13 @@ services:
     volumes:
       - ./service_accounts:/app/service_accounts:ro
       - ./data_dev:/tmp
+
+  pipeline-load:
+    build:
+      context: .
+      dockerfile: ./devops/docker/Dockerfile.elt
+    env_file:
+      - .local/elt.env
+    volumes:
+      - ./service_accounts:/app/service_accounts:ro
+    command: ["python", "/app/src/health_data/load_health_metrics.py"]

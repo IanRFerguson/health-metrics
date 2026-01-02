@@ -15,3 +15,7 @@ server-docker-push:
 		.
 
 	@docker push us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest
+
+
+pipeline:
+	@docker compose up pipeline-load --build
