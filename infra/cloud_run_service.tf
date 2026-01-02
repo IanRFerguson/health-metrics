@@ -18,6 +18,7 @@ resource "google_cloud_run_v2_service" "health_metrics_app" {
 
   template {
     max_instance_request_concurrency = 5
+    service_account                  = google_service_account.health_metrics_sa.email
 
     containers {
       image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest"
