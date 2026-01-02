@@ -14,7 +14,7 @@ else:
 HEALTH_METRIC_FLAT_FILE_MAP = {
     "global": {
         "bucket_name": os.environ["GCS_BUCKET_NAME"],
-        "destination_schmea": DESTINATION_SCHEMA_NAME,
+        "destination_schema": DESTINATION_SCHEMA_NAME,
     },
     "workouts": {"prefix": "workouts", "destination_table": "apple_workouts"},
     "health": {

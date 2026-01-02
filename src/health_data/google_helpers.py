@@ -1,14 +1,90 @@
+import logging
+import sys
+import tempfile
+from datetime import datetime
+
+import polars as pl
 from google.cloud import storage
 from klondike.gcp.bigquery import BigQueryConnector
-from polars import DataFrame
 
 from common.logger import logger
 
 #####
 
+logger_to_suppress = logging.getLogger("klondike.gcp.bigquery")
+logger_to_suppress.setLevel(logging.WARNING)
+logger_to_suppress.propagate = False
 
-def load_single_blob_to_bigquery() -> None:
-    pass
+
+def standardize_column_name(column_name: str) -> str:
+    """
+    Standardizes column names by converting to lowercase and replacing spaces with underscores.
+
+    Args:
+        column_name (str): The original column name
+
+    Returns:
+        str: The standardized column name
+    """
+
+    return (
+        column_name.strip()
+        .lower()
+        .replace(" ", "_")
+        .replace("(", "_")
+        .replace(")", "")
+        .replace("/", "_")
+        .replace("[", "")
+        .replace("]", "")
+        .replace("·", "_")
+    )
+
+
+def load_single_blob_to_bigquery(
+    storage_client: storage.Client,
+    bigquery_client: BigQueryConnector,
+    bucket_name: str,
+    blob_name: str,
+    destination_schema: str,
+    destination_table: str,
+) -> None:
+    """
+    Loads a single blob from GCS into a BigQuery table.
+
+    Args:
+        storage_client (storage.Client): Storage client to read from GCS
+        bigquery_client (BigQueryConnector): BigQuery client to write to BigQuery
+        bucket_name (str): GCS bucket name
+        blob_name (str): GCS blob name
+        destination_schema (str): BigQuery destination schema
+        destination_table (str): BigQuery destination table
+    """
+
+    logger.debug(f"*** Loading blob: gs://{bucket_name}/{blob_name}")
+
+    # Download blob to a temporary file
+    with tempfile.NamedTemporaryFile() as temp_file:
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        blob.download_to_filename(temp_file.name)
+
+        # Read the data into a Polars DataFrame
+        df: pl.DataFrame = pl.DataFrame._read_csv(temp_file.name)
+
+        # Add load timestamp column
+        df = df.with_columns(_load_timestamp=pl.lit(datetime.now()))
+
+        for col in df.columns:
+            standardized_col = standardize_column_name(col)
+            if standardized_col != col:
+                df = df.rename({col: standardized_col})
+
+        # Write the DataFrame to BigQuery
+        bigquery_client.write_dataframe(
+            df=df,
+            table_name=f"{destination_schema}.{destination_table}",
+            if_exists="append",
+        )
 
 
 def load_source_data_to_bigquery(
@@ -35,25 +111,44 @@ def load_source_data_to_bigquery(
         destination_table (str): BigQuery destination table
     """
 
-    target_blobs = storage_client.list_blobs(bucket_or_name=bucket_name, prefix=prefix)
+    target_blobs = [
+        blob
+        for blob in storage_client.list_blobs(bucket_or_name=bucket_name, prefix=prefix)
+    ]
     logger.info(f"* Writing {source} data to BigQuery")
-    logger.info(f"** Read {len(target_blobs)} from gs://{bucket_name}/{prefix}")
+    logger.info(
+        f"** Read {len(target_blobs)} flat files from gs://{bucket_name}/{prefix}"
+    )
     logger.info(f"** Writing to `{destination_schema}.{destination_table}`")
 
+    if bigquery_client.table_exists(
+        table_name=f"{destination_schema}.{destination_table}"
+    ):
+        logger.info(
+            f"** Deleting existing table `{destination_schema}.{destination_table}`"
+        )
+        bigquery_client.query(
+            f"DROP TABLE `{destination_schema}.{destination_table}`",
+            return_results=False,
+        )
+
     errors = []
-    for blob_name in target_blobs:
+    for blob in target_blobs:
         try:
             load_single_blob_to_bigquery(
                 storage_client=storage_client,
                 bigquery_client=bigquery_client,
                 bucket_name=bucket_name,
-                blob_name=blob_name,
+                blob_name=blob.name,
                 destination_schema=destination_schema,
                 destination_table=destination_table,
             )
         except Exception as e:
-            logger.error(f"** Failed @ {blob_name} ... {e}")
-            errors.append((blob_name, e))
+            logger.error(f"** Failed @ {blob.name} ... {e}")
+            errors.append((blob.name, e))
 
     if errors:
-        pass
+        logger.error(f"* Completed with {len(errors)} errors:")
+        for blob_name, error in errors:
+            logger.error(f"** {blob_name} ... {error}")
+        sys.exit(1)
