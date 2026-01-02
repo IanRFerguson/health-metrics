@@ -1,8 +1,5 @@
-[project]
-dependencies = ["dbt-bigquery==1.8.0", "klondike"]
+[health-metrics]
 name = "health-metrics"
-version = "0.1.0"
-
 
 [tool.ruff]
 line-length = 88

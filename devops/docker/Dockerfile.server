@@ -1,0 +1,14 @@
+FROM python:3.12-bullseye
+
+WORKDIR /app
+
+COPY ./devops/dependencies/server-requirements.txt .
+RUN pip install -r server-requirements.txt
+
+COPY ./app/backend .
+COPY ./common ./common
+
+ENV PYTHONPATH="/app:/app/common"
+EXPOSE 5000
+
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "--timeout", "300", "wsgi"]

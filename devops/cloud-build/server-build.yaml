@@ -1,0 +1,38 @@
+  steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+    - 'build'
+    - '-t' 
+    - 'gcr.io/ian-is-online/health-metrics/app-image:$COMMIT_SHA' 
+    - '-t'
+    - 'gcr.io/ian-is-online/health-metrics/app-image:latest'
+    - '-f'
+    - 'devops/docker/Dockerfile.server'
+    - '.'
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/ian-is-online/health-metrics/app-image:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/ian-is-online/health-metrics/app-image:latest']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - 'health-metrics-app-service'
+    - '--image'
+    - 'gcr.io/ian-is-online/health-metrics/app-image:$COMMIT_SHA'
+    - '--region'
+    - 'us-central1'
+  
+  images:
+  - 'gcr.io/ian-is-online/health-metrics/app-image:$COMMIT_SHA'
+  - 'gcr.io/ian-is-online/health-metrics/app-image:latest'
+  
+  options:
+    logging: CLOUD_LOGGING_ONLY 
