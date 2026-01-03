@@ -14,9 +14,20 @@ services:
   pipeline-load:
     build:
       context: .
-      dockerfile: ./devops/docker/Dockerfile.elt
+      dockerfile: ./devops/docker/Dockerfile.pipe
     env_file:
       - .local/elt.env
     volumes:
       - ./service_accounts:/app/service_accounts:ro
-    command: ["python", "/app/src/health_data/load_health_metrics.py"]
+    command: ["python", "/app/src/health_data/main.py"]
+
+  pipeline-shell:
+    build:
+      context: .
+      dockerfile: ./devops/docker/Dockerfile.pipe
+    env_file:
+      - .local/elt.env
+    volumes:
+      - ./service_accounts:/app/service_accounts:ro
+      - ./src/analytics:/app/src/analytics
+    command: ["sleep", "infinity"]

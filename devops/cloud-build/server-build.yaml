@@ -25,6 +25,8 @@
     - 'run'
     - 'deploy'
     - 'health-metrics-app-service'
+    - "--service-account"
+    - "health-metrics-sa@ian-is-online.iam.gserviceaccount.com"
     - '--image'
     - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:$COMMIT_SHA'
     - '--region'

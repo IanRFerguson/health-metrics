@@ -40,14 +40,14 @@ def standardize_column_name(column_name: str) -> str:
     )
 
 
-def load_single_blob_to_bigquery(
+def read_dataframe_from_gcs(
     storage_client: storage.Client,
     bigquery_client: BigQueryConnector,
     bucket_name: str,
     blob_name: str,
     destination_schema: str,
     destination_table: str,
-) -> None:
+) -> pl.DataFrame:
     """
     Loads a single blob from GCS into a BigQuery table.
 
@@ -72,19 +72,18 @@ def load_single_blob_to_bigquery(
         df: pl.DataFrame = pl.DataFrame._read_csv(temp_file.name)
 
         # Add load timestamp column
-        df = df.with_columns(_load_timestamp=pl.lit(datetime.now()))
+        df = df.with_columns(
+            _load_timestamp=pl.lit(datetime.now()),
+            _source_bucket_name=pl.lit(bucket_name),
+            _source_filename=pl.lit(blob_name),
+        )
 
         for col in df.columns:
             standardized_col = standardize_column_name(col)
             if standardized_col != col:
                 df = df.rename({col: standardized_col})
 
-        # Write the DataFrame to BigQuery
-        bigquery_client.write_dataframe(
-            df=df,
-            table_name=f"{destination_schema}.{destination_table}",
-            if_exists="append",
-        )
+        return df
 
 
 def load_source_data_to_bigquery(
@@ -132,16 +131,18 @@ def load_source_data_to_bigquery(
             return_results=False,
         )
 
-    errors = []
+    dataframes, errors = [], []
     for blob in target_blobs:
         try:
-            load_single_blob_to_bigquery(
-                storage_client=storage_client,
-                bigquery_client=bigquery_client,
-                bucket_name=bucket_name,
-                blob_name=blob.name,
-                destination_schema=destination_schema,
-                destination_table=destination_table,
+            dataframes.append(
+                read_dataframe_from_gcs(
+                    storage_client=storage_client,
+                    bigquery_client=bigquery_client,
+                    bucket_name=bucket_name,
+                    blob_name=blob.name,
+                    destination_schema=destination_schema,
+                    destination_table=destination_table,
+                )
             )
         except Exception as e:
             logger.error(f"** Failed @ {blob.name} ... {e}")
@@ -152,3 +153,12 @@ def load_source_data_to_bigquery(
         for blob_name, error in errors:
             logger.error(f"** {blob_name} ... {error}")
         sys.exit(1)
+
+    if dataframes:
+        df = pl.concat(dataframes, how="vertical_relaxed")
+        bigquery_client.write_dataframe(
+            df=df,
+            table_name=f"{destination_schema}.{destination_table}",
+            if_exists="fail",
+        )
+        logger.info(f"* Successfully loaded {len(dataframes)} files into BigQuery")

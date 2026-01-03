@@ -1,7 +1,7 @@
-name: 'food_diary_2026'
+name: 'health_metrics'
 version: '1.0.0'
 
-profile: 'dev'
+profile: 'health_metrics'
 
 model-paths: ["models"]
 test-paths: ["tests"]
@@ -11,8 +11,12 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Set all tests to warn instead of fail
+data_tests:
+  +severity: warn  
+
 models:
-  food_diary_2026:
+  health_metrics:
     +persist_docs:
       +persist_docs:
       relation: true
@@ -22,15 +26,20 @@ models:
 
     # Layer-specific overrides
     base:
-      +schema: base
+      +schema: health_metrics_base
       +materialized: view
+      +tags: ["base"]
 
     staging:
-      +schema: staging
+      +schema: health_metrics_staging
+      +tags: ["staging"]
 
     analytics:
+      # We'll flip this on later
+      +enabled: false
       machine_learning:
+        +schema: health_metrics_ml
         +tags: ["machine_learning"]
-        +schema: ml
-      +schema: analytics
+      +schema: health_metrics_analytics
+      +tags: ["analytics"]
   

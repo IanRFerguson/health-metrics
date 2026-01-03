@@ -8,7 +8,7 @@
     - '-t'
     - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest'
     - '-f'
-    - 'devops/docker/Dockerfile.pipeline'
+    - 'devops/docker/Dockerfile.pipe'
     - '.'
   
   # Push the container image to Container Registry
@@ -26,6 +26,8 @@
     - 'jobs'
     - 'update'
     - 'load-job'
+    - "--service-account"
+    - "health-metrics-sa@ian-is-online.iam.gserviceaccount.com"
     - '--image'
     - 'us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:$COMMIT_SHA'
     - '--region'

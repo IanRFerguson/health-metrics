@@ -3,10 +3,10 @@ import os
 import click
 from constants import HEALTH_METRIC_FLAT_FILE_MAP
 from google.cloud import storage
-from google_helpers import load_source_data_to_bigquery
 from klondike.gcp.bigquery import BigQueryConnector
 
 from common.logger import logger
+from health_data.helpers import load_source_data_to_bigquery
 
 #####
 
@@ -59,7 +59,13 @@ def main(source: str, debug: bool, quiet: bool):
         logger.debug("** Debugger Active **")
 
     storage_client = storage.Client()
-    bigquery_client = BigQueryConnector()
+
+    match os.environ["STAGE"]:
+        case "production":
+            logger.info("Running in production mode")
+            bigquery_client = BigQueryConnector(bypass_env_variable=True)
+        case _:
+            bigquery_client = BigQueryConnector()
 
     load_source_data(
         source=source.strip().upper(),
