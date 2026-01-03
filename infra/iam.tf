@@ -6,7 +6,8 @@ locals {
     "cloudbuild.builds.editor",
     "logging.logWriter",
     "artifactregistry.createOnPushWriter",
-    "run.developer"
+    "run.developer",
+    "iam.serviceAccountUser"
   ]
 }
 
