@@ -59,7 +59,13 @@ def main(source: str, debug: bool, quiet: bool):
         logger.debug("** Debugger Active **")
 
     storage_client = storage.Client()
-    bigquery_client = BigQueryConnector()
+
+    match os.environ["STAGE"]:
+        case "production":
+            logger.info("Running in production mode")
+            bigquery_client = BigQueryConnector(bypass_env_variable=True)
+        case _:
+            bigquery_client = BigQueryConnector()
 
     load_source_data(
         source=source.strip().upper(),
