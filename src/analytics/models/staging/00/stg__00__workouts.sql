@@ -56,6 +56,14 @@ SELECT
     flights_climbed,
     elevation_ascended,
     elevation_descended,    
-    _load_timestamp
+    _load_timestamp,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "workout_start",
+                "time_of_day"
+            ]
+        )
+    }} AS surrogate_pk
 
 FROM staged

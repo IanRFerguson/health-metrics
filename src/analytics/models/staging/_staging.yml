@@ -1,0 +1,30 @@
+models:
+  # 00 Models
+  - name: stg__00__food_journal
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk
+  
+  - name: stg__00__health_metrics
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk
+  
+  - name: stg__00__workouts
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk
+
+  # 01 Models
+  - name: stg__01__health_metrics
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk

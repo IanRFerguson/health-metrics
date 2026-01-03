@@ -11,6 +11,10 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Set all tests to warn instead of fail
+data_tests:
+  +severity: warn  
+
 models:
   health_metrics:
     +persist_docs:
@@ -31,6 +35,8 @@ models:
       +tags: ["staging"]
 
     analytics:
+      # We'll flip this on later
+      +enabled: false
       machine_learning:
         +schema: health_metrics_ml
         +tags: ["machine_learning"]

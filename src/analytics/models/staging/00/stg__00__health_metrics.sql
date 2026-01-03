@@ -7,7 +7,7 @@ WITH
             physical_effort__kcal_hr_kg AS physical_effort_kcal_hr_kg,
             resting_energy__kcal AS resting_energy_kcal,
             
-            apple_exercise_time__min AS exercise_minutes,
+            apple_exercise_time__min AS excercise_minutes,
             apple_stand_hour__count AS stand_count,
             apple_stand_time__min AS stand_minutes,
             `blood_oxygen_saturation__%` AS blood_oxygen_saturation_percent,
@@ -41,11 +41,31 @@ WITH
         
         -- NOTE: This indicates that I wasn't wearing my watch at the time
         WHERE active_energy__kcal IS NOT NULL
+
+        -- NOTE: This is to handle rare instances where there's overlap
+        -- in the export files (we'll grab what we assume is the later record)
+        QUALIFY ROW_NUMBER() OVER (
+            PARTITION BY date_time
+            ORDER BY active_energy__kcal DESC
+        ) = 1
     )
 
 SELECT 
     
     DATE(base.date_time) AS measurement_date,
-    base.*
+    base.* EXCEPT(`weight`),
+    LAST_VALUE(`weight` IGNORE NULLS) OVER (
+        PARTITION BY DATE(base.date_time)
+        ORDER BY base.date_time
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS `weight`,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "date_time",
+                "time_of_day"
+            ]
+        )
+    }} AS surrogate_pk
     
 FROM base

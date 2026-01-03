@@ -30,7 +30,15 @@ SELECT
     message_unique_id,
     est_loaded_at,
     {{ parse_time_of_day("est_loaded_at") }} AS time_of_day,
-    UPPER(TRIM(food_line_item)) AS food_line_item
+    UPPER(TRIM(food_line_item)) AS food_line_item,
+    {{
+        dbt_utils.generate_surrogate_key(
+            [
+                "message_unique_id",
+                "food_line_item"
+            ]
+        )
+    }} AS surrogate_pk
     
 FROM parsed
 WHERE DATE(est_loaded_at) >= '2025-12-01'
