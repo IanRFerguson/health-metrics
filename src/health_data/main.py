@@ -3,10 +3,10 @@ import os
 import click
 from constants import HEALTH_METRIC_FLAT_FILE_MAP
 from google.cloud import storage
-from google_helpers import load_source_data_to_bigquery
 from klondike.gcp.bigquery import BigQueryConnector
 
 from common.logger import logger
+from health_data.helpers import load_source_data_to_bigquery
 
 #####
 
