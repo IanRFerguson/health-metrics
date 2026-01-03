@@ -9,3 +9,8 @@ COPY ./src /app/src
 COPY ./common /app/src/common
 
 ENV PYTHONPATH="/app/src:${PYTHONPATH}"
+
+WORKDIR /app/src/analytics
+RUN dbt deps
+
+WORKDIR /app

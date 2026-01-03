@@ -21,6 +21,11 @@ pipeline:
 	@docker compose up pipeline-load --build
 
 
+pipeline-shell:
+	@docker compose up pipeline-shell --build -d;
+	@docker compose exec -it pipeline-shell bash
+
+
 pipeline-docker-push:
 	@docker build \
 		-t us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest \
