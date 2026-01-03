@@ -1,4 +1,6 @@
 sources:
   - name: health
     tables:
-      - food_diary_2026
+      - name: apple_health_metrics
+      - name: apple_workouts
+      - name: food_diary_2026
