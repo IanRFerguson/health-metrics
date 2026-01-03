@@ -24,7 +24,7 @@ pipeline:
 pipeline-docker-push:
 	@docker build \
 		-t us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest \
-		-f ./devops/docker/Dockerfile.elt \
+		-f ./devops/docker/Dockerfile.pipeline \
 		--platform linux/amd64 \
 		.
 

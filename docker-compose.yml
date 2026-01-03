@@ -14,7 +14,7 @@ services:
   pipeline-load:
     build:
       context: .
-      dockerfile: ./devops/docker/Dockerfile.elt
+      dockerfile: ./devops/docker/Dockerfile.pipeline
     env_file:
       - .local/elt.env
     volumes:
