@@ -5,7 +5,8 @@ locals {
     "bigquery.jobUser",
     "cloudbuild.builds.editor",
     "logging.logWriter",
-    "artifactregistry.createOnPushWriter"
+    "artifactregistry.createOnPushWriter",
+    "run.developer"
   ]
 }
 
