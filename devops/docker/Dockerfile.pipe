@@ -2,8 +2,8 @@ FROM python:3.12-bullseye
 
 WORKDIR /app
 
-COPY ./devops/dependencies/elt-requirements.txt /app/elt-requirements.txt
-RUN pip install -r /app/elt-requirements.txt
+COPY ./devops/dependencies/pipeline-requirements.txt /app/pipeline-requirements.txt
+RUN pip install -r /app/pipeline-requirements.txt
 
 COPY ./src /app/src
 COPY ./common /app/src/common

@@ -8,7 +8,7 @@ resource "google_cloud_run_v2_job" "load_job" {
         image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
         command = ["python"]
-        args    = ["/app/src/health_data/load_health_metrics.py"]
+        args    = ["/app/src/health_data/main.py"]
 
         env {
           name  = "STAGE"
