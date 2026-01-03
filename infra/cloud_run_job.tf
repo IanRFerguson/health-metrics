@@ -28,3 +28,25 @@ resource "google_cloud_run_v2_job" "load_job" {
     }
   }
 }
+
+
+resource "google_cloud_run_v2_job" "transform_job" {
+  name     = "transform-job"
+  location = "us-central1"
+
+  template {
+    template {
+      containers {
+        image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
+
+        command = ["dbt"]
+        args    = ["build", "-t", "cloud"]
+
+        env {
+          name  = "DBT_PROFILES_DIR"
+          value = "/app/src/analytics"
+        }
+      }
+    }
+  }
+}
