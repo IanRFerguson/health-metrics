@@ -4,6 +4,10 @@ resource "google_cloud_run_v2_job" "load_job" {
 
   template {
     template {
+
+      service_account = google_service_account.health_metrics_sa.email
+      max_retries     = 0
+
       containers {
         image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
@@ -36,11 +40,14 @@ resource "google_cloud_run_v2_job" "transform_job" {
 
   template {
     template {
-      containers {
-        image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
-        command = ["dbt"]
-        args    = ["build", "-t", "cloud"]
+      service_account = google_service_account.health_metrics_sa.email
+      max_retries     = 0
+
+      containers {
+        image   = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
+        command = ["/bin/sh", "-c"]
+        args    = ["cd /app/src/analytics && dbt build -t cloud"]
 
         env {
           name  = "DBT_PROFILES_DIR"

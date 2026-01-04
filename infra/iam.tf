@@ -7,7 +7,8 @@ locals {
     "logging.logWriter",
     "artifactregistry.createOnPushWriter",
     "run.developer",
-    "iam.serviceAccountUser"
+    "iam.serviceAccountUser",
+    "iam.serviceAccountTokenCreator"
   ]
 }
 
