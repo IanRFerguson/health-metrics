@@ -7,18 +7,18 @@ WITH
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `end`) AS workout_end,
             duration AS workout_duration,
 
-            total_energy__kcal AS total_energy,
-            active_energy__kcal AS active_energy,
-            max_heart_rate__bpm AS max_heart_rate,
-            avg_heart_rate__bpm AS average_heart_rate,
+            CAST(total_energy__kcal AS FLOAT64) AS total_energy,
+            CAST(active_energy__kcal AS FLOAT64) AS active_energy,
+            CAST(max_heart_rate__bpm AS FLOAT64) AS max_heart_rate,
+            CAST(avg_heart_rate__bpm AS FLOAT64) AS average_heart_rate,
 
-            distance__mi AS distance_in_miles,
-            avg_speed_mi_hr AS average_speed,
-            step_count__count AS step_count,
-            step_cadence__spm AS step_cadence,
-            flights_climbed__count AS flights_climbed,
-            elevation_ascended__ft AS elevation_ascended,
-            elevation_descended__ft AS elevation_descended,
+            CAST(distance__mi AS FLOAT64) AS distance_in_miles,
+            CAST(avg_speed_mi_hr AS FLOAT64) AS average_speed,
+            CAST(step_count__count AS FLOAT64) AS step_count,
+            CAST(step_cadence__spm AS FLOAT64) AS step_cadence,
+            CAST(flights_climbed__count AS FLOAT64) AS flights_climbed,
+            CAST(elevation_ascended__ft AS FLOAT64) AS elevation_ascended,
+            CAST(elevation_descended__ft AS FLOAT64) AS elevation_descended,
 
             _load_timestamp
 
@@ -34,6 +34,10 @@ WITH
 
         FROM base
         GROUP BY ALL
+        QUALIFY ROW_NUMBER() OVER (
+            PARTITION BY workout_start, workout_type
+            ORDER BY _load_timestamp DESC
+        ) = 1
     )
 
 SELECT

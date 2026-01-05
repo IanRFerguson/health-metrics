@@ -1,14 +1,19 @@
 locals {
   health_sa_roles = [
-    "storage.objectUser",
-    "bigquery.dataEditor",
+    "storage.admin",
+    "bigquery.admin",
     "bigquery.jobUser",
     "cloudbuild.builds.editor",
     "logging.logWriter",
     "artifactregistry.createOnPushWriter",
     "run.developer",
     "iam.serviceAccountUser",
-    "iam.serviceAccountTokenCreator"
+    "iam.serviceAccountTokenCreator",
+    "aiplatform.user",
+    "bigquery.connectionUser",
+    "storage.bucketViewer",
+    "dataproc.admin",
+    "dataproc.worker",
   ]
 }
 
