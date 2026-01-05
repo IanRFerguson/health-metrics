@@ -35,9 +35,8 @@ models:
       +tags: ["staging"]
 
     analytics:
-      # We'll flip this on later
-      +enabled: false
       machine_learning:
+        +enabled: false
         +schema: health_metrics_ml
         +tags: ["machine_learning"]
       +schema: health_metrics_analytics
