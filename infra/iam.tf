@@ -6,7 +6,7 @@ locals {
     "cloudbuild.builds.editor",
     "logging.logWriter",
     "artifactregistry.createOnPushWriter",
-    "run.developer",
+    "run.admin",
     "iam.serviceAccountUser",
     "iam.serviceAccountTokenCreator",
     "aiplatform.user",
@@ -14,6 +14,8 @@ locals {
     "storage.bucketViewer",
     "dataproc.admin",
     "dataproc.worker",
+    "monitoring.notificationChannelEditor",
+    "monitoring.alertPolicyEditor"
   ]
 }
 

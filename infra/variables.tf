@@ -7,3 +7,8 @@ variable "WEBHOOK_API_KEY" {
   type        = string
   sensitive   = true
 }
+
+variable "MY_EMAIL_ADDRESS" {
+  description = "Email address to receive alert notifications."
+  type        = string
+}
