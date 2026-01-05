@@ -9,10 +9,6 @@ health_metrics:
       threads: 4
       keyfile: /app/service_accounts/ian-is-online-e8d79794493b.json
       location: us
-      compute_region: us-central1
-      submission_method: bigframes
-      gcs_bucket: health-metrics-4dd9b4b7
-      dataproc_batch_container_image: us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest
     
     cloud:
       type: bigquery
@@ -21,7 +17,3 @@ health_metrics:
       dataset: dbt
       threads: 4
       location: us
-      compute_region: us
-      submission_method: bigframes
-      gcs_bucket: health-metrics-4dd9b4b7
-      dataproc_batch_container_image: us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest
