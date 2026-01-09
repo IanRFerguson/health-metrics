@@ -45,6 +45,7 @@ WITH
             ROUND(SUM(stand_count), 3) AS sum_stand_count,
             ROUND(SUM(flights_climbed), 3) AS sum_flights_climbed,
             ROUND(SUM(step_count), 3) AS sum_step_count,
+            MAX(`weight`) AS weight_lb
 
 
         FROM {{ ref("stg__00__health_metrics") }}
@@ -62,6 +63,7 @@ SELECT
     health_metrics.sum_stand_count,
     health_metrics.sum_flights_climbed,
     health_metrics.sum_step_count,
+    CAST(health_metrics.weight_lb AS FLOAT64) AS weight_lb,
     workouts.daily_workouts,
     food_intake.food_line_items,
     {{
