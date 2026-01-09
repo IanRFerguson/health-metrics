@@ -38,7 +38,7 @@ resource "google_workflows_workflow" "job_orchestrator" {
 }
 
 resource "google_cloud_scheduler_job" "workflow_trigger" {
-  name             = "daily-gemini-rating-trigger"
+  name             = "pipeline-workflow-trigger"
   description      = "Triggers the ML orchestration workflow"
   schedule         = "0 13,15,17,19,21,23 * * *" # Runs every two hours between 8 AM and 8 PM daily
   time_zone        = "UTC"
@@ -52,6 +52,9 @@ resource "google_cloud_scheduler_job" "workflow_trigger" {
 
     # Workflows expects an empty JSON body or arguments
     body = base64encode("{}")
+    headers = {
+      "Content-Type" = "application/json"
+    }
 
     oauth_token {
       service_account_email = google_service_account.health_metrics_sa.email

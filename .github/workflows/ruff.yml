@@ -6,9 +6,6 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - synchronize
-      - ready_for_review 
 
 jobs:
   ruff: 
