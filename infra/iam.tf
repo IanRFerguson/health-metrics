@@ -15,7 +15,8 @@ locals {
     "dataproc.admin",
     "dataproc.worker",
     "monitoring.notificationChannelEditor",
-    "monitoring.alertPolicyEditor"
+    "monitoring.alertPolicyEditor",
+    "workflows.invoker"
   ]
 }
 
