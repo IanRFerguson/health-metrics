@@ -39,7 +39,7 @@ def compare_logged_flat_files(
     log_table: str,
     source: str,
     all_blobs: List[storage.Blob],
-) -> List[str]:
+) -> List[storage.Blob]:
     """
     Compares all blobs in GCS with those already logged in the BigQuery log table.
     Returns a list of blobs that have not yet been logged.
@@ -51,7 +51,7 @@ def compare_logged_flat_files(
         all_blobs (List[storage.Blob]): List of all blobs in GCS
 
     Returns:
-        List[str]: List of blob names that have not yet been logged
+        List[storage.Blob]: List of blobs that have not yet been logged
     """
 
     logged_blobs = bigquery_client.query(
@@ -87,7 +87,8 @@ def log_loaded_flat_files(
         bigquery_client (BigQueryConnector): BigQuery client to write to BigQuery
         log_table (str): Fully qualified log table name
         source (str): Source of health data
-        loaded_blobs (List[storage.Blob]): List of loaded blobs
+        loaded_blobs: List of loaded blobs
+        bucket_name (str): Name of the GCS bucket
     """
 
     df = pl.DataFrame(

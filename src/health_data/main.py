@@ -4,7 +4,6 @@ import os
 import click
 from constants import HEALTH_METRIC_FLAT_FILE_MAP, LOG_TABLE_NAME
 from google.cloud import storage
-from klondike import logger as klondike_logger
 from klondike.gcp.bigquery import BigQueryConnector
 
 from common.logger import metrics_logger
@@ -95,7 +94,7 @@ def main(source: str, debug: bool, quiet: bool, full_refresh: bool):
 
     if quiet:
         metrics_logger.setLevel("WARNING")
-    elif debug or os.environ["STAGE"] != "production":
+    elif debug or os.environ.get("STAGE", "development") != "production":
         metrics_logger.setLevel("DEBUG")
         metrics_logger.debug("** Debugger Active **")
 
@@ -104,7 +103,7 @@ def main(source: str, debug: bool, quiet: bool, full_refresh: bool):
 
     storage_client = storage.Client()
     bigquery_client = BigQueryConnector(
-        bypass_env_variable=os.environ["STAGE"] == "production"
+        bypass_env_variable=os.environ.get("STAGE", "development") == "production"
     )
 
     if not bigquery_client.table_exists(LOG_TABLE_NAME):
