@@ -5,7 +5,7 @@ from constants import HEALTH_METRIC_FLAT_FILE_MAP
 from google.cloud import storage
 from klondike.gcp.bigquery import BigQueryConnector
 
-from common.logger import logger
+from common.logger import metrics_logger
 from health_data.helpers import load_source_data_to_bigquery
 
 #####
@@ -53,16 +53,16 @@ def main(source: str, debug: bool, quiet: bool):
     """
 
     if quiet:
-        logger.setLevel("WARNING")
+        metrics_logger.setLevel("WARNING")
     elif debug or os.environ["STAGE"] != "production":
-        logger.setLevel("DEBUG")
-        logger.debug("** Debugger Active **")
+        metrics_logger.setLevel("DEBUG")
+        metrics_logger.debug("** Debugger Active **")
 
     storage_client = storage.Client()
 
     match os.environ["STAGE"]:
         case "production":
-            logger.info("Running in production mode")
+            metrics_logger.info("Running in production mode")
             bigquery_client = BigQueryConnector(bypass_env_variable=True)
         case _:
             bigquery_client = BigQueryConnector()
