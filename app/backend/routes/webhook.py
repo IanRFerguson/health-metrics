@@ -7,7 +7,7 @@ import pandas as pd
 from flask import Blueprint, request
 from google.cloud import storage
 
-from common.logger import logger
+from common.logger import metrics_logger
 
 #####
 
@@ -41,7 +41,9 @@ def write_payload_to_gcs(
     # Upload the DataFrame as a CSV to GCS
     blob.upload_from_filename(temp_file_path, content_type="text/csv")
 
-    logger.info(f"Uploaded {data_type} data to gs://%s/%s", bucket_name, blob_name)
+    metrics_logger.info(
+        f"Uploaded {data_type} data to gs://%s/%s", bucket_name, blob_name
+    )
 
 
 @bp.route("/load", methods=["POST"])
@@ -64,13 +66,13 @@ def webhook_load():
     if api_key != webhook_api_key:
         return "Unauthorized", 401
 
-    logger.info("Received webhook payload at %s", datetime.now())
+    metrics_logger.info("Received webhook payload at %s", datetime.now())
 
     # Extract CSV data from multipart form data
     # The file is in request.files with key "HealthData"
-    logger.debug(request.files)
+    metrics_logger.debug(request.files)
     if EXPORT_FILE_KEY_MAP.get(data_type) not in request.files:
-        logger.error(f"No {EXPORT_FILE_KEY_MAP.get(data_type)} file in request")
+        metrics_logger.error(f"No {EXPORT_FILE_KEY_MAP.get(data_type)} file in request")
         return (
             f"Bad Request: No {EXPORT_FILE_KEY_MAP.get(data_type)} file uploaded",
             400,
@@ -79,7 +81,7 @@ def webhook_load():
     file = request.files[EXPORT_FILE_KEY_MAP.get(data_type)]
     payload = file.read().decode("utf-8")
 
-    logger.debug(f"Received CSV data with {len(payload)} characters")
+    metrics_logger.debug(f"Received CSV data with {len(payload)} characters")
 
     write_payload_to_gcs(
         bucket_name=os.environ["GCS_BUCKET_NAME"],
