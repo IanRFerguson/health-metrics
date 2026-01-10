@@ -61,7 +61,7 @@ def compare_logged_flat_files(
         FROM `{log_table}`
         WHERE source = '{source}';
         """
-    ).to_polars()
+    )
 
     if logged_blobs.is_empty():
         metrics_logger.warning("No logs found - returning all flat file names")

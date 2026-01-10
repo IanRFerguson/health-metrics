@@ -63,19 +63,25 @@ def read_dataframe_from_gcs(
         # Read the data into a Polars DataFrame
         df: pl.DataFrame = pl.DataFrame._read_csv(temp_file.name)
 
-        # Add load timestamp column
-        df = df.with_columns(
-            _load_timestamp=pl.lit(datetime.now()),
-            _source_bucket_name=pl.lit(bucket_name),
-            _source_filename=pl.lit(blob_name),
-        )
+    # Standardize column names to remove any problematic characters
+    for col in df.columns:
+        standardized_col = standardize_column_name(col)
+        if standardized_col != col:
+            df = df.rename({col: standardized_col})
 
-        for col in df.columns:
-            standardized_col = standardize_column_name(col)
-            if standardized_col != col:
-                df = df.rename({col: standardized_col})
+    # Ensure all columns are of type string to avoid schema conflicts
+    df = df.with_columns(
+        [pl.col(col).cast(pl.Utf8, strict=False) for col in df.columns]
+    )
 
-        return df
+    # Add key metadata fields
+    df = df.with_columns(
+        _load_timestamp=pl.lit(datetime.now()),
+        _source_bucket_name=pl.lit(bucket_name),
+        _source_filename=pl.lit(blob_name),
+    )
+
+    return df
 
 
 def truncate_single_source(
