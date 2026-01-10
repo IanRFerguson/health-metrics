@@ -9,7 +9,7 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 BQ_CLIENT = bigquery.Client()
 
 
-@bp.route("weekly-stats", methods=["GET"])
+@bp.route("/weekly-stats", methods=["GET"])
 def get_weekly_stats():
     """
     This endpoint hits the analytical dbt models in BigQuery
@@ -36,7 +36,7 @@ def get_weekly_stats():
     return jsonify(data)
 
 
-@bp.route("last-updated-at", methods=["GET"])
+@bp.route("/last-updated-at", methods=["GET"])
 def get_dbt_last_updated_at():
     """
     This endpoint retrieves the last updated timestamp
