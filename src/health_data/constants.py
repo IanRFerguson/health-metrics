@@ -11,6 +11,10 @@ else:
     metrics_logger.debug(f"Writing to development schema ({DESTINATION_SCHEMA_NAME})")
 
 
+# We'll log all of the files that get loaded for each data source
+LOG_TABLE_NAME = f"{DESTINATION_SCHEMA_NAME}._elt_log"
+
+
 HEALTH_METRIC_FLAT_FILE_MAP = {
     "global": {
         "bucket_name": os.environ["GCS_BUCKET_NAME"],

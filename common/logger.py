@@ -7,12 +7,19 @@ from google.cloud.logging import Client as LoggingClient
 
 #####
 
-if os.environ.get("STAGE") != "production":
+# If we're running production, persist logs to Google Cloud Logging
+if os.environ.get("STAGE") == "production":
+    logging_client = LoggingClient()
+    logging_client.setup_logging()
+    metrics_logger = logging.getLogger("google.cloud.logging")
+    metrics_logger.setLevel("INFO")
+
+# Otherwise, log to stdout with colored output
+else:
     metrics_logger = logging.getLogger(__name__)
     _handler = logging.StreamHandler(sys.stdout)
     _formatter = ColoredFormatter(
         "%(log_color)s%(levelname)s%(reset)s %(message)s",
-        datefmt=None,
         reset=True,
         log_colors={
             "DEBUG": "cyan",
@@ -21,7 +28,6 @@ if os.environ.get("STAGE") != "production":
             "ERROR": "red",
             "CRITICAL": "red,bg_white",
         },
-        secondary_log_colors={},
         style="%",
     )
 
@@ -32,9 +38,3 @@ if os.environ.get("STAGE") != "production":
     if os.environ.get("DEBUG") == "true":
         metrics_logger.setLevel("DEBUG")
         metrics_logger.debug("Logging at debug level")
-
-else:
-    logging_client = LoggingClient()
-    logging_client.setup_logging()
-    metrics_logger = logging.getLogger("google.cloud.logging")
-    metrics_logger.setLevel("INFO")
