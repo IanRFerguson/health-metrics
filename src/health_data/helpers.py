@@ -7,7 +7,7 @@ import polars as pl
 from google.cloud import storage
 from klondike.gcp.bigquery import BigQueryConnector
 
-from common.logger import logger
+from common.logger import metrics_logger
 
 #####
 
@@ -60,7 +60,7 @@ def read_dataframe_from_gcs(
         destination_table (str): BigQuery destination table
     """
 
-    logger.debug(f"*** Loading blob: gs://{bucket_name}/{blob_name}")
+    metrics_logger.debug(f"*** Loading blob: gs://{bucket_name}/{blob_name}")
 
     # Download blob to a temporary file
     with tempfile.NamedTemporaryFile() as temp_file:
@@ -114,16 +114,16 @@ def load_source_data_to_bigquery(
         blob
         for blob in storage_client.list_blobs(bucket_or_name=bucket_name, prefix=prefix)
     ]
-    logger.info(f"* Writing {source} data to BigQuery")
-    logger.info(
+    metrics_logger.info(f"* Writing {source} data to BigQuery")
+    metrics_logger.info(
         f"** Read {len(target_blobs)} flat files from gs://{bucket_name}/{prefix}"
     )
-    logger.info(f"** Writing to `{destination_schema}.{destination_table}`")
+    metrics_logger.info(f"** Writing to `{destination_schema}.{destination_table}`")
 
     if bigquery_client.table_exists(
         table_name=f"{destination_schema}.{destination_table}"
     ):
-        logger.info(
+        metrics_logger.info(
             f"** Deleting existing table `{destination_schema}.{destination_table}`"
         )
         bigquery_client.query(
@@ -145,13 +145,13 @@ def load_source_data_to_bigquery(
                 )
             )
         except Exception as e:
-            logger.error(f"** Failed @ {blob.name} ... {e}")
+            metrics_logger.error(f"** Failed @ {blob.name} ... {e}")
             errors.append((blob.name, e))
 
     if errors:
-        logger.error(f"* Completed with {len(errors)} errors:")
+        metrics_logger.error(f"* Completed with {len(errors)} errors:")
         for blob_name, error in errors:
-            logger.error(f"** {blob_name} ... {error}")
+            metrics_logger.error(f"** {blob_name} ... {error}")
         sys.exit(1)
 
     if dataframes:
@@ -161,4 +161,6 @@ def load_source_data_to_bigquery(
             table_name=f"{destination_schema}.{destination_table}",
             if_exists="fail",
         )
-        logger.info(f"* Successfully loaded {len(dataframes)} files into BigQuery")
+        metrics_logger.info(
+            f"* Successfully loaded {len(dataframes)} files into BigQuery"
+        )
