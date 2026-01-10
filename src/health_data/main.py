@@ -16,7 +16,7 @@ from health_data.pipeline_helpers import (
 #####
 
 # We'll suppress Klondike logs throughout
-logging.getLogger("klondike").setLevel("WARNING")
+logging.getLogger("klondike").setLevel("ERROR")
 
 
 def load_source_data(
