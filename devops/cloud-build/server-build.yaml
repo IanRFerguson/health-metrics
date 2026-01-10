@@ -24,7 +24,7 @@
     args:
     - 'run'
     - 'deploy'
-    - 'health-metrics-app-service'
+    - 'health-metrics-app'
     - "--service-account"
     - "health-metrics-sa@ian-is-online.iam.gserviceaccount.com"
     - '--image'
