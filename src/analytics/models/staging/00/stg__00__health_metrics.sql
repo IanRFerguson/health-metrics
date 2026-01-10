@@ -3,9 +3,9 @@ WITH
         SELECT
         
             date_time,
-            active_energy__kcal AS active_energy_kcal,
-            physical_effort__kcal_hr_kg AS physical_effort_kcal_hr_kg,
-            resting_energy__kcal AS resting_energy_kcal,
+            CAST(active_energy__kcal AS FLOAT64) AS active_energy_kcal,
+            CAST(physical_effort__kcal_hr_kg AS FLOAT64) AS physical_effort_kcal_hr_kg,
+            CAST(resting_energy__kcal AS FLOAT64) AS resting_energy_kcal,
             
             CAST(apple_exercise_time__min AS FLOAT64) AS excercise_minutes,
             CAST(apple_stand_hour__count AS FLOAT64) AS stand_count,
