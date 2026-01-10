@@ -59,7 +59,7 @@ function WeeklyStats() {
                         day: 'numeric',
                         year: 'numeric'
                     }),
-                    total_exercise_minutes: Number(item.total_excercise_minutes) || 0,
+                    total_exercise_minutes: Number(item.total_exercise_minutes) || 0,
                     avg_weight_lb: Number(item.avg_weight_lb || "Missing"),
                 }))
 
