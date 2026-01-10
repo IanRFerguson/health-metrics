@@ -61,13 +61,13 @@ def compare_logged_flat_files(
         FROM `{log_table}`
         WHERE source = '{source}';
         """
-    ).to_pandas()
+    ).to_polars()
 
-    if logged_blobs.empty:
+    if logged_blobs.is_empty():
         metrics_logger.warning("No logs found - returning all flat file names")
         return all_blobs
 
-    logged_blob_names = set(logged_blobs["source_filename"].tolist())
+    logged_blob_names = set(logged_blobs["source_filename"].to_list())
     target_blobs = [blob for blob in all_blobs if blob.name not in logged_blob_names]
 
     return target_blobs
