@@ -18,6 +18,7 @@ def get_weekly_stats():
 
     metrics_logger.info("Fetching weekly health metrics from BigQuery")
 
+    # TODO - Let's move the project / dataset to a config at some point
     query = """
     SELECT 
         * 
@@ -45,6 +46,7 @@ def get_dbt_last_updated_at():
 
     metrics_logger.info("Fetching dbt last updated timestamp from BigQuery")
 
+    # TODO - Let's move the project / dataset to a config at some point
     query = """
     SELECT 
         MAX(_dbt_last_run_at) AS last_updated_at
