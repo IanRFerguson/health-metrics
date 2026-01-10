@@ -1,5 +1,6 @@
 dbt-bigquery
 klondike
 google-cloud-storage
+google-cloud-logging
 colorlog
 bigframes

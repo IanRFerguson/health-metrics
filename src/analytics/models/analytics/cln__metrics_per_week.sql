@@ -48,7 +48,8 @@ SELECT
     
     staged.*,
     workout_metrics.high_impact_workouts,
-    workout_metrics.total_miles_run
+    workout_metrics.total_miles_run,
+    CURRENT_TIMESTAMP() AS _dbt_last_run_at
 
 
 FROM staged
