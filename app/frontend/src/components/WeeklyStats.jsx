@@ -1,35 +1,10 @@
 import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-        const data = payload[0].payload; // Contains all fields from the data object
-        return (
-            <div style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                color: '#fff'
-            }}>
-                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>Week of {label}</p>
-                <p style={{ margin: 0, color: '#8884d8' }}>
-                    Exercise: {payload[0].value} minutes
-                </p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Weight: {data.avg_weight_lb} lbs</p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Miles Run: {data.total_miles_run}</p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Mileage Goal: {data.total_miles_run >= 10 ? "✅" : "❌"}</p>
-
-                {/* Debug: see all available fields */}
-                {/* <details style={{ marginTop: '5px', fontSize: '10px' }}>
-                    <summary>Available fields</summary>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
-                </details> */}
-            </div>
-        );
-    }
-    return null;
-};
+// We've broken these into individual components for maximum customizability
+import ExercisePlot from "./plots/Exercise";
+import WeightPlot from "./plots/Weight";
+import MilesPlot from "./plots/Miles";
 
 function WeeklyStats() {
     const [data, setData] = useState([]);
@@ -38,9 +13,9 @@ function WeeklyStats() {
     const [selectedMetric, setSelectedMetric] = useState('total_exercise_minutes');
 
     const metrics = [
-        { key: 'total_exercise_minutes', label: 'Exercise Minutes', color: '#8884d8' },
-        { key: 'avg_weight_lb', label: 'Average Weight (lbs)', color: '#82ca9d' },
-        { key: 'total_miles_run', label: 'Miles Run', color: '#ffc658' },
+        { key: 'total_exercise_minutes', plot_component: ExercisePlot, label: 'Total Exercise Minutes' },
+        { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Average Weight (lbs)' },
+        { key: 'total_miles_run', plot_component: MilesPlot, label: 'Miles Run' },
         // Add more metrics as needed
     ];
 
@@ -105,21 +80,7 @@ function WeeklyStats() {
                 </select>
             </div>
             <ResponsiveContainer width="90%" height={500}>
-                <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="start_date" />
-                    <YAxis domain={['auto', 'auto']} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line
-                        type="monotone"
-                        dataKey={selectedMetric}
-                        stroke={currentMetric.color}
-                        name={currentMetric.label}
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                    />
-                </LineChart>
+                {currentMetric.plot_component({ data })}
             </ResponsiveContainer>
         </div>
     );
