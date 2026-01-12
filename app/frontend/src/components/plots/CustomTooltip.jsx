@@ -1,4 +1,4 @@
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, isDaily = false }) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload; // Contains all fields from the data object
         return (
@@ -9,7 +9,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                 borderRadius: '4px',
                 color: '#fff'
             }}>
-                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>Week of {label}</p>
+                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>{isDaily ? `${label}` : `Week of ${label}`}</p>
                 <p style={{ margin: 0, color: '#8884d8' }}>
                     Exercise: {payload[0].value.toFixed(2)} minutes
                 </p>

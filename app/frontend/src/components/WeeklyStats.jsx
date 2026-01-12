@@ -10,12 +10,14 @@ import MilesPlot from "./plots/Miles";
 const CACHE_DURATION = 5 * 60 * 1000;
 
 function WeeklyStats() {
+    // These state variables manage data fetching and UI state
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedMetric, setSelectedMetric] = useState('total_exercise_minutes');
     const [dailyStats, setDailyStats] = useState(false);
 
+    // This array informs our dropdown (that builds the plot)
     const metrics = [
         { key: 'total_exercise_minutes', plot_component: ExercisePlot, label: 'Total Exercise Minutes' },
         { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
@@ -33,6 +35,7 @@ function WeeklyStats() {
                 const cached = sessionStorage.getItem(cacheKey);
                 const cacheTimestamp = sessionStorage.getItem(`${cacheKey}_timestamp`);
 
+                // If cached data exists and is fresh, use it instead of calling the API again
                 if (cached && cacheTimestamp) {
                     const age = Date.now() - parseInt(cacheTimestamp);
                     if (age < CACHE_DURATION) {
@@ -47,8 +50,6 @@ function WeeklyStats() {
                 const response = await fetch(endpoint);
                 if (!response.ok) throw new Error(`Failed to fetch ${dailyStats ? 'daily' : 'weekly'} stats`);
                 const result = await response.json();
-
-                console.log('Raw API result:', result);
 
                 // Format the data for the chart
                 const formattedData = result.map(item => {
@@ -83,13 +84,13 @@ function WeeklyStats() {
                 setLoading(false);
             }
         };
-
         fetchStats();
     }, [dailyStats]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
+    // This is the value that's currently selected from the dropdown
     const currentMetric = metrics.find(m => m.key === selectedMetric);
 
     return (
@@ -116,7 +117,7 @@ function WeeklyStats() {
                 </select>
             </div>
             <ResponsiveContainer width="90%" height={500}>
-                {currentMetric.plot_component({ data })}
+                {currentMetric.plot_component({ data: data, isDaily: dailyStats })}
             </ResponsiveContainer>
             <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <label htmlFor="daily-toggle" style={{ fontWeight: 'bold' }}>Daily Stats:</label>
