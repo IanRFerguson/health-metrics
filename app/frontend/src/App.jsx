@@ -1,6 +1,6 @@
 import './App.css'
 import Header from './components/Header.jsx';
-import WeeklyStats from './components/WeeklyStats.jsx';
+import HealthMetrics from './components/HealthMetrics.jsx';
 import PasswordGate from './components/PasswordGate.jsx';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
         <Header />
       </div>
       <div>
-        <WeeklyStats />
+        <HealthMetrics />
       </div>
     </>
   );
@@ -22,6 +22,8 @@ function App() {
   }
 
   return (
+    // NOTE: The password here is largely included to prevent casual browsing of the app.
+    // It is not intended to be a robust security measure.
     <PasswordGate password="shred">
       {content}
     </PasswordGate>

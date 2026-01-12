@@ -9,7 +9,7 @@ import MilesPlot from "./plots/Miles";
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
 
-function WeeklyStats() {
+function HealthMetrics() {
     // These state variables manage data fetching and UI state
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,6 +26,10 @@ function WeeklyStats() {
 
     useEffect(() => {
         const fetchStats = async () => {
+            // Reset data state
+            setData([]);
+
+            // Indicate loading state
             setLoading(true);
             try {
                 const endpoint = dailyStats ? '/api/daily-stats' : '/api/weekly-stats';
@@ -69,7 +73,7 @@ function WeeklyStats() {
                         total_exercise_minutes: Number(item.total_exercise_minutes) || 0,
                         avg_weight_lb: Number(item.avg_weight_lb || "Missing"),
                     };
-                })
+                });
 
                 console.log('Fetched fresh data:', formattedData);
 
@@ -92,6 +96,7 @@ function WeeklyStats() {
 
     // This is the value that's currently selected from the dropdown
     const currentMetric = metrics.find(m => m.key === selectedMetric);
+    const PlotComponent = currentMetric.plot_component;
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -117,7 +122,7 @@ function WeeklyStats() {
                 </select>
             </div>
             <ResponsiveContainer width="90%" height={500}>
-                {currentMetric.plot_component({ data: data, isDaily: dailyStats })}
+                <PlotComponent data={data} isDaily={dailyStats} />
             </ResponsiveContainer>
             <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <label htmlFor="daily-toggle" style={{ fontWeight: 'bold' }}>Daily Stats:</label>
@@ -137,4 +142,4 @@ function WeeklyStats() {
     );
 }
 
-export default WeeklyStats;
+export default HealthMetrics;

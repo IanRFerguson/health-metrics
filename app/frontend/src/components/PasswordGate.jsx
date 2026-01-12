@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+// NOTE: The password here is largely included to prevent casual browsing of the app.
+// It is not intended to be a robust security measure.
 export default function PasswordGate({ children, password = 'health2026' }) {
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [inputValue, setInputValue] = useState('');

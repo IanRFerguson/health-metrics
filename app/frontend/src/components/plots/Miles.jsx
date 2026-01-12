@@ -1,5 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import CustomTooltip from './CustomTooltip';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from 'recharts';
 
 export default function MilesPlot({ data, isDaily = false }) {
     return (
@@ -7,11 +6,14 @@ export default function MilesPlot({ data, isDaily = false }) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="start_date" />
             <YAxis domain={['auto', 'auto']} />
-            <Bar
-                dataKey="total_miles_run"
-                fill={!isDaily ? (data.total_miles_run >= 10 ? "#83da77ff" : "#d89284ff") : "#3b82f6"}
-
-            />
+            <Bar dataKey="total_miles_run">
+                {data.map((entry, index) => (
+                    <Cell
+                        key={`cell-${index}`}
+                        fill={!isDaily ? (entry.total_miles_run >= 10 ? "#00BFC4" : "#F8766D") : "#00BFC4"}
+                    />
+                ))}
+            </Bar>
         </BarChart>
     );
 }

@@ -1,6 +1,5 @@
 const CustomTooltip = ({ active, payload, label, isDaily = false }) => {
     if (active && payload && payload.length) {
-        const data = payload[0].payload; // Contains all fields from the data object
         return (
             <div style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -17,7 +16,7 @@ const CustomTooltip = ({ active, payload, label, isDaily = false }) => {
                 {/* Debug: see all available fields */}
                 {/* <details style={{ marginTop: '5px', fontSize: '10px' }}>
                     <summary>Available fields</summary>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                    <pre>{JSON.stringify(payload[0].payload, null, 2)}</pre>
                 </details> */}
             </div>
         );
