@@ -11,11 +11,8 @@ const CustomTooltip = ({ active, payload, label }) => {
             }}>
                 <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>Week of {label}</p>
                 <p style={{ margin: 0, color: '#8884d8' }}>
-                    Exercise: {payload[0].value} minutes
+                    Exercise: {payload[0].value.toFixed(2)} minutes
                 </p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Weight: {data.avg_weight_lb} lbs</p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Miles Run: {data.total_miles_run}</p>
-                <p style={{ margin: 0, color: '#8884d8' }}>Mileage Goal: {data.total_miles_run >= 10 ? "✅" : "❌"}</p>
 
                 {/* Debug: see all available fields */}
                 {/* <details style={{ marginTop: '5px', fontSize: '10px' }}>

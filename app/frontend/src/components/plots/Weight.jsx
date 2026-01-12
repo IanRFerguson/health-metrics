@@ -11,9 +11,17 @@ export default function WeightPlot({ data }) {
             <Legend />
             <Line
                 type="monotone"
-                dataKey={"avg_weight_lb"}
+                dataKey={"min_weight_lb"}
                 stroke={"#82ca9d"}
-                name={"Average Weight (lb)"}
+                name={"Minimum Weight"}
+                strokeWidth={2}
+                dot={{ r: 4 }}
+            />
+            <Line
+                type="monotone"
+                dataKey={"max_weight_lb"}
+                stroke={"#3b82f6"}
+                name={"Maximum Weight"}
                 strokeWidth={2}
                 dot={{ r: 4 }}
             />
