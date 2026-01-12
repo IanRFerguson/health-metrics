@@ -37,6 +37,35 @@ def get_weekly_stats():
     return jsonify(data)
 
 
+@bp.route("/daily-stats", methods=["GET"])
+def get_daily_stats():
+    """
+    This endpoint hits the analytical dbt models in BigQuery
+    to get daily health metrics for the current year.
+    """
+
+    metrics_logger.info("Fetching daily health metrics from BigQuery")
+
+    # TODO - Let's move the project / dataset to a config at some point
+    query = """
+    SELECT 
+        * EXCEPT(target_date),
+        target_date AS start_date
+    FROM `ian-is-online.dbt_health_metrics_analytics.cln__metrics_per_day`
+    WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
+    ORDER BY target_date
+    """
+    metrics_logger.debug(f"Executing query: {query}")
+
+    query_job = BQ_CLIENT.query(query)
+    results = query_job.result()
+
+    data = [dict(row) for row in results]
+    metrics_logger.info(f"Retrieved {len(data)} records from BigQuery")
+
+    return jsonify(data)
+
+
 @bp.route("/last-updated-at", methods=["GET"])
 def get_dbt_last_updated_at():
     """
