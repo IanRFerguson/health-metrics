@@ -23,7 +23,7 @@ SELECT
     ROUND(AVG(dw.average_heart_rate), 3) AS avg_average_heart_rate,
     ROUND(MAX(dw.average_heart_rate), 3) AS max_average_heart_rate
 
-FROM base,
-    UNNEST(base.daily_workouts) AS dw
+FROM base
+LEFT JOIN UNNEST(base.daily_workouts) AS dw
 WHERE dw.high_impact
 GROUP BY ALL

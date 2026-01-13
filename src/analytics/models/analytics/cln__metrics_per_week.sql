@@ -4,7 +4,7 @@ WITH
     ),
 
     workout_metrics AS (
-        SELECT
+        SELECT DISTINCT
 
             DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
             COUNTIF(dw.high_impact) AS high_impact_workouts,
@@ -17,8 +17,8 @@ WITH
                 ), 
             3) AS total_miles_run
 
-        FROM base,
-            UNNEST(base.daily_workouts) AS dw
+        FROM base
+        LEFT JOIN UNNEST(base.daily_workouts) AS dw
         GROUP BY 1
     ),
 
@@ -53,4 +53,4 @@ SELECT
 
 
 FROM staged
-JOIN workout_metrics USING(start_date)
+LEFT JOIN workout_metrics USING(start_date)
