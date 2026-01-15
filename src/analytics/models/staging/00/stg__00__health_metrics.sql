@@ -1,3 +1,32 @@
+{% set target_columns = [
+    "active_energy_kcal",
+    "physical_effort_kcal_hr_kg",
+    "resting_energy_kcal",
+    "exercise_minutes",
+    "stand_count",
+    "stand_minutes",
+    "blood_oxygen_saturation_percent",
+    "cardio_recovery_minutes",
+    "flights_climbed",
+    "heart_rate_minimum_minutes",
+    "heart_rate_maximum_minutes",
+    "heart_rate_resting_minutes",
+    "heart_rate_average_minutes",
+    "heart_rate_variability_ms",
+    "resting_heart_rate_minutes",
+    "stair_speed_down_ft_s",
+    "stair_speed_up_ft_s",
+    "step_count",
+    "time_in_daylight_min",
+    "vo2_max_ml_kg_min",
+    "walking_plus_running_distance_mi",
+    "walking_asymmetry_percentage_percent",
+    "walking_double_support_percentage_percent",
+    "walking_heart_rate_average_minutes",
+    "walking_speed_mi_hr",
+    "walking_step_length_in"
+] %}
+
 WITH
     base AS (
         SELECT
@@ -7,7 +36,7 @@ WITH
             CAST(physical_effort__kcal_hr_kg AS FLOAT64) AS physical_effort_kcal_hr_kg,
             CAST(resting_energy__kcal AS FLOAT64) AS resting_energy_kcal,
             
-            CAST(apple_exercise_time__min AS FLOAT64) AS excercise_minutes,
+            CAST(apple_exercise_time__min AS FLOAT64) AS exercise_minutes,
             CAST(apple_stand_hour__count AS FLOAT64) AS stand_count,
             CAST(apple_stand_time__min AS FLOAT64) AS stand_minutes,
             CAST(`blood_oxygen_saturation__%` AS FLOAT64) AS blood_oxygen_saturation_percent,
@@ -41,31 +70,48 @@ WITH
         
         -- NOTE: This indicates that I wasn't wearing my watch at the time
         WHERE active_energy__kcal IS NOT NULL
+    ),
 
-        -- NOTE: This is to handle rare instances where there's overlap
-        -- in the export files (we'll grab what we assume is the later record)
-        QUALIFY ROW_NUMBER() OVER (
-            PARTITION BY date_time
-            ORDER BY active_energy__kcal DESC
-        ) = 1
+    agg AS (
+        SELECT
+            
+            date_time,
+            
+            {% for col in target_columns %}
+                SUM({{ col }}) AS {{ col }},
+            {% endfor %}
+        
+        FROM base
+        GROUP BY date_time
+    ),
+
+    joined AS (
+        SELECT
+            
+            DATE(agg.date_time) AS measurement_date,
+            agg.*,
+            time_of_day,
+            utc_loaded_at,
+            LAST_VALUE(base.`weight` IGNORE NULLS) OVER (
+                PARTITION BY DATE(agg.date_time)
+                ORDER BY agg.date_time
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) AS `weight`,
+            {{
+                dbt_utils.generate_surrogate_key(
+                    [
+                        "date_time",
+                        "time_of_day"
+                    ]
+                )
+            }} AS surrogate_pk
+            
+        FROM agg
+        LEFT JOIN base USING (date_time)
     )
 
-SELECT 
-    
-    DATE(base.date_time) AS measurement_date,
-    base.* EXCEPT(`weight`),
-    LAST_VALUE(`weight` IGNORE NULLS) OVER (
-        PARTITION BY DATE(base.date_time)
-        ORDER BY base.date_time
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS `weight`,
-    {{
-        dbt_utils.generate_surrogate_key(
-            [
-                "date_time",
-                "time_of_day"
-            ]
-        )
-    }} AS surrogate_pk
-    
-FROM base
+SELECT * FROM joined
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY surrogate_pk 
+    ORDER BY utc_loaded_at DESC
+) = 1
