@@ -24,7 +24,7 @@ WITH
                     active_energy,
                     max_heart_rate,
                     average_heart_rate,
-                    step_count AS excercise_step_count
+                    step_count AS exercise_step_count
                 )
             ) AS daily_workouts
 
@@ -41,7 +41,7 @@ WITH
             ROUND(SUM(physical_effort_kcal_hr_kg), 3) AS sum_physical_effort_kcal,
             ROUND(SUM(resting_energy_kcal), 3) AS sum_resting_energy_kcal,
 
-            ROUND(SUM(excercise_minutes), 3) AS sum_excercise_minutes,
+            ROUND(SUM(exercise_minutes), 3) AS sum_exercise_minutes,
             ROUND(SUM(stand_count), 3) AS sum_stand_count,
             ROUND(SUM(flights_climbed), 3) AS sum_flights_climbed,
             ROUND(SUM(step_count), 3) AS sum_step_count,
@@ -59,7 +59,7 @@ SELECT
     health_metrics.sum_active_energy_kcal,
     health_metrics.sum_physical_effort_kcal,
     health_metrics.sum_resting_energy_kcal,
-    health_metrics.sum_excercise_minutes,
+    health_metrics.sum_exercise_minutes,
     health_metrics.sum_stand_count,
     health_metrics.sum_flights_climbed,
     health_metrics.sum_step_count,

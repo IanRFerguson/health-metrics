@@ -2,7 +2,7 @@
     "active_energy_kcal",
     "physical_effort_kcal_hr_kg",
     "resting_energy_kcal",
-    "excercise_minutes",
+    "exercise_minutes",
     "stand_count",
     "stand_minutes",
     "blood_oxygen_saturation_percent",
@@ -36,7 +36,7 @@ WITH
             CAST(physical_effort__kcal_hr_kg AS FLOAT64) AS physical_effort_kcal_hr_kg,
             CAST(resting_energy__kcal AS FLOAT64) AS resting_energy_kcal,
             
-            CAST(apple_exercise_time__min AS FLOAT64) AS excercise_minutes,
+            CAST(apple_exercise_time__min AS FLOAT64) AS exercise_minutes,
             CAST(apple_stand_hour__count AS FLOAT64) AS stand_count,
             CAST(apple_stand_time__min AS FLOAT64) AS stand_minutes,
             CAST(`blood_oxygen_saturation__%` AS FLOAT64) AS blood_oxygen_saturation_percent,
@@ -86,7 +86,7 @@ WITH
     ),
 
     joined AS (
-        SELECT DISTINCT
+        SELECT
             
             DATE(agg.date_time) AS measurement_date,
             agg.*,
