@@ -2,7 +2,14 @@ WITH
     base AS (
         SELECT
             
-            UPPER(TRIM(`type`)) AS workout_type,
+            -- NOTE: This is to buffer against the watch
+            -- assigning the wrong type of workout on start
+            CASE
+                WHEN UPPER(TRIM(`type`)) LIKE '%OTHER%'
+                    THEN 'STRENGTH (OTHER)'
+                ELSE UPPER(TRIM(`type`))
+            END AS workout_type,
+            
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `start`) AS workout_start,
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `end`) AS workout_end,
             duration AS workout_duration,
