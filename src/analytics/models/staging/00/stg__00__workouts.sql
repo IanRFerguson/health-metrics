@@ -5,7 +5,7 @@ WITH
             -- NOTE: This is to buffer against the watch
             -- assigning the wrong type of workout on start
             CASE
-                WHEN UPPER(TRIM(`type`)) LIKE '%OTHER%'
+                WHEN UPPER(TRIM(`type`)) = 'OTHER'
                     THEN 'STRENGTH (OTHER)'
                 ELSE UPPER(TRIM(`type`))
             END AS workout_type,
