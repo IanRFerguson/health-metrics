@@ -73,7 +73,3 @@ WITH
     )
 
 SELECT * FROM joined
--- QUALIFY ROW_NUMBER() OVER (
---     PARTITION BY surrogate_pk 
---     ORDER BY utc_loaded_at DESC
--- ) = 1
