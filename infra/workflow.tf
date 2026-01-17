@@ -1,3 +1,7 @@
+locals {
+  cron_schedule = "0 13,15,17 * * *" # Run at 8 AM, 12 PM, and 5 PM daily Eastern Time
+}
+
 resource "google_workflows_workflow" "job_orchestrator" {
   name            = "run-pipeline"
   region          = "us-central1"
@@ -40,7 +44,7 @@ resource "google_workflows_workflow" "job_orchestrator" {
 resource "google_cloud_scheduler_job" "workflow_trigger" {
   name             = "pipeline-workflow-trigger"
   description      = "Triggers the ML orchestration workflow"
-  schedule         = "0 13,15,17,19,21,23 * * *" # Runs every two hours between 8 AM and 8 PM daily
+  schedule         = local.cron_schedule
   time_zone        = "UTC"
   region           = "us-central1"
   attempt_deadline = "320s"
