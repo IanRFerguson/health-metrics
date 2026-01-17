@@ -1,32 +1,3 @@
-{% set target_columns = [
-    "active_energy_kcal",
-    "physical_effort_kcal_hr_kg",
-    "resting_energy_kcal",
-    "exercise_minutes",
-    "stand_count",
-    "stand_minutes",
-    "blood_oxygen_saturation_percent",
-    "cardio_recovery_minutes",
-    "flights_climbed",
-    "heart_rate_minimum_minutes",
-    "heart_rate_maximum_minutes",
-    "heart_rate_resting_minutes",
-    "heart_rate_average_minutes",
-    "heart_rate_variability_ms",
-    "resting_heart_rate_minutes",
-    "stair_speed_down_ft_s",
-    "stair_speed_up_ft_s",
-    "step_count",
-    "time_in_daylight_min",
-    "vo2_max_ml_kg_min",
-    "walking_plus_running_distance_mi",
-    "walking_asymmetry_percentage_percent",
-    "walking_double_support_percentage_percent",
-    "walking_heart_rate_average_minutes",
-    "walking_speed_mi_hr",
-    "walking_step_length_in"
-] %}
-
 WITH
     base AS (
         SELECT
@@ -70,31 +41,23 @@ WITH
         
         -- NOTE: This indicates that I wasn't wearing my watch at the time
         WHERE active_energy__kcal IS NOT NULL
-    ),
 
-    agg AS (
-        SELECT
-            
-            date_time,
-            
-            {% for col in target_columns %}
-                SUM({{ col }}) AS {{ col }},
-            {% endfor %}
-        
-        FROM base
-        GROUP BY date_time
+        -- NOTE: This is intended to filter out duplicate exports per hour ... we'll assume
+        -- that the record with a higher active energy value is the more complete one
+        QUALIFY ROW_NUMBER() OVER (
+            PARTITION BY DATE(date_time), EXTRACT(HOUR FROM CAST(date_time AS TIMESTAMP))
+            ORDER BY active_energy__kcal DESC, utc_loaded_at DESC
+        ) = 1
     ),
 
     joined AS (
         SELECT
             
-            DATE(agg.date_time) AS measurement_date,
-            agg.*,
-            time_of_day,
-            utc_loaded_at,
+            DATE(base.date_time) AS measurement_date,
+            base.* EXCEPT(weight),
             LAST_VALUE(base.`weight` IGNORE NULLS) OVER (
-                PARTITION BY DATE(agg.date_time)
-                ORDER BY agg.date_time
+                PARTITION BY DATE(base.date_time)
+                ORDER BY base.date_time
                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS `weight`,
             {{
@@ -106,12 +69,7 @@ WITH
                 )
             }} AS surrogate_pk
             
-        FROM agg
-        LEFT JOIN base USING (date_time)
+        FROM base
     )
 
 SELECT * FROM joined
-QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY surrogate_pk 
-    ORDER BY utc_loaded_at DESC
-) = 1
