@@ -12,10 +12,6 @@ resource "google_cloud_run_v2_service" "health_metrics_app" {
     type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
   }
 
-  scaling {
-    min_instance_count = 1
-  }
-
   template {
     max_instance_request_concurrency = 5
     service_account                  = google_service_account.health_metrics_sa.email

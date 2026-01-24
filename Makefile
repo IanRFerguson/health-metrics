@@ -6,6 +6,9 @@ ruff:
 server:
 	@docker compose up app --build
 
+frontend:
+	@cd ./app/frontend && npm install && npm run dev
+
 
 server-docker-push:
 	@docker build \

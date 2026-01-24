@@ -1,6 +1,8 @@
 resource "google_cloud_run_v2_job" "load_job" {
-  name     = "load-job"
-  location = "us-central1"
+  name           = "load-job"
+  location       = "us-central1"
+  client         = "gcloud"
+  client_version = "552.0.0"
 
   template {
     template {
