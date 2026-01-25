@@ -12,8 +12,8 @@ FROM python:3.12-bullseye
 
 WORKDIR /app
 
-COPY ./devops/dependencies/server-requirements.txt .
-RUN pip install -r server-requirements.txt
+COPY pyproject.toml .
+RUN pip install uv && uv sync
 
 COPY ./app/backend .
 COPY ./common ./common
@@ -24,4 +24,4 @@ COPY --from=build /app/frontend/dist ./frontend/dist
 ENV PYTHONPATH="/app:/app/common"
 EXPOSE 5000
 
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "--timeout", "300", "wsgi"]
+CMD ["uv", "run", "gunicorn", "-b", "0.0.0.0:5000", "--timeout", "300", "wsgi"]
