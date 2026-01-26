@@ -14,8 +14,8 @@ function HealthMetrics() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedMetric, setSelectedMetric] = useState('total_exercise_minutes');
-    const [dailyStats, setDailyStats] = useState(false);
+    const [selectedMetric, setSelectedMetric] = useState('total_miles_run');
+    const [dailyStats, setDailyStats] = useState(true);
 
     // This array informs our dropdown (that builds the plot)
     const metrics = [
