@@ -7,6 +7,7 @@ WITH
         SELECT
 
             DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+            dw.pace,
             COUNTIF(dw.high_impact) AS high_impact_workouts,
             ROUND(
                 SUM(
@@ -19,7 +20,7 @@ WITH
 
         FROM base
         LEFT JOIN UNNEST(base.daily_workouts) AS dw
-        GROUP BY 1
+        GROUP BY 1,2
     ),
 
     staged AS (
@@ -63,6 +64,10 @@ SELECT
 
     workout_metrics.high_impact_workouts,
     workout_metrics.total_miles_run,
+    
+    -- TODO: Calculate average pace correctly
+    -- AVG(workout_metrics.pace) AS avg_pace,
+    
     CURRENT_TIMESTAMP() AS _dbt_last_run_at
 
 

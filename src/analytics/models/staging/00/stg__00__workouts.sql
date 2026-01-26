@@ -12,7 +12,7 @@ WITH
             
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `start`) AS workout_start,
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `end`) AS workout_end,
-            duration AS workout_duration,
+            CAST(duration AS TIME) AS workout_duration,
 
             CAST(total_energy__kcal AS FLOAT64) AS total_energy,
             CAST(active_energy__kcal AS FLOAT64) AS active_energy,
@@ -37,7 +37,12 @@ WITH
 
             base.*,
             {{ parse_time_of_day("workout_start") }} AS time_of_day,
-            (workout_type LIKE ANY('%RUN%', '%STRENGTH%')) AS high_impact
+            (workout_type LIKE ANY('%RUN%', '%STRENGTH%')) AS high_impact,
+            CASE
+                WHEN workout_type LIKE '%RUN%'
+                    THEN CAST(TIME_DIFF(workout_duration, '00:00:00', SECOND) / distance_in_miles AS INT64)
+                ELSE null
+            END AS pace_seconds
 
         FROM base
         GROUP BY ALL
@@ -54,6 +59,7 @@ SELECT
     workout_start,
     workout_end,
     workout_duration,
+    FORMAT_TIME('%M:%S', TIME_ADD(TIME '00:00:00', INTERVAL pace_seconds SECOND)) AS pace,
     high_impact,
     time_of_day,
     distance_in_miles,
