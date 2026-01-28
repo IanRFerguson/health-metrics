@@ -83,7 +83,7 @@ def get_monthly_stats():
         strength_workouts,
         running_workouts,
         total_miles_run,
-        pct_weeks_running_goal_met,
+        pct_weeks_running_goal_met * 100.0 AS pct_weeks_running_goal_met,
         avg_step_count,
         avg_weight_lb,
         weight_loss_since_new_year_pct

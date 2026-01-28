@@ -102,9 +102,6 @@ function HealthMetrics() {
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* Metric Cards */}
-            <MetricCards />
-
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <label htmlFor="metric-select" style={{ fontWeight: 'bold' }}>Metric:</label>
                 <select
@@ -143,6 +140,9 @@ function HealthMetrics() {
                     }}
                 />
             </div>
+
+            {/* Metric Cards */}
+            <MetricCards />
 
             {/* Monthly Stats Table */}
             <StatsTable />

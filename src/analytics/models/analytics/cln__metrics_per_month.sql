@@ -34,7 +34,7 @@ WITH
             ROUND(SUM(total_miles_run), 3) AS total_miles_run,
             SUM(running_workouts) / NULLIF(COUNT(DISTINCT start_date), 0) AS avg_running_workouts_per_week,
             COUNTIF(running_goal_met) AS weeks_running_goal_met,
-            COUNTIF(running_goal_met) / NULLIF(COUNT(DISTINCT start_date), 0) AS pct_weeks_running_goal_met,
+            COUNTIF(running_goal_met) / NULLIF(COUNT(DISTINCT start_date), 0) AS pct_weeks_running_goal_met
         
         FROM {{ ref("cln__metrics_per_week") }}
         GROUP BY 1,2

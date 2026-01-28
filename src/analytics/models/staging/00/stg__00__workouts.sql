@@ -40,7 +40,7 @@ WITH
             (workout_type LIKE ANY('%RUN%', '%STRENGTH%')) AS high_impact,
             CASE
                 WHEN workout_type LIKE '%RUN%'
-                    THEN CAST(TIME_DIFF(workout_duration, '00:00:00', SECOND) / distance_in_miles AS INT64)
+                    THEN CAST(TIME_DIFF(workout_duration, '00:00:00', SECOND) / NULLIF(distance_in_miles, 0) AS INT64)
                 ELSE null
             END AS pace_seconds
 
@@ -59,7 +59,7 @@ SELECT
     workout_start,
     workout_end,
     workout_duration,
-    FORMAT_TIME('%M:%S', TIME_ADD(TIME '00:00:00', INTERVAL pace_seconds SECOND)) AS pace,
+    SAFE.FORMAT_TIME('%M:%S', TIME_ADD(TIME '00:00:00', INTERVAL pace_seconds SECOND)) AS pace,
     high_impact,
     time_of_day,
     distance_in_miles,
