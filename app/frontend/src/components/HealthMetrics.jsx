@@ -5,6 +5,8 @@ import { ResponsiveContainer } from 'recharts';
 import ExercisePlot from "./plots/Exercise";
 import WeightPlot from "./plots/Weight";
 import MilesPlot from "./plots/Miles";
+import MetricCards from "./MetricCards";
+import StatsTable from "./StatsTable";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -100,6 +102,9 @@ function HealthMetrics() {
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Metric Cards */}
+            <MetricCards />
+
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <label htmlFor="metric-select" style={{ fontWeight: 'bold' }}>Metric:</label>
                 <select
@@ -138,6 +143,9 @@ function HealthMetrics() {
                     }}
                 />
             </div>
+
+            {/* Monthly Stats Table */}
+            <StatsTable />
         </div>
     );
 }
