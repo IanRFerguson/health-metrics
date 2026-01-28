@@ -8,6 +8,8 @@ WITH
 
             DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
             COUNTIF(dw.high_impact) AS high_impact_workouts,
+            COUNTIF(dw.workout_type LIKE '%STRENGTH%') AS strength_workouts,
+            COUNTIF(dw.workout_type LIKE '%RUN%') AS running_workouts,
             ROUND(
                 SUM(
                     CASE 
@@ -50,7 +52,7 @@ WITH
 
 SELECT 
     
-    staged.* EXCEPT(days_recorded),
+    staged.*,
 
     -- AVERAGES
     ROUND(staged.total_active_energy_kcal / NULLIF(staged.days_recorded, 0), 3) AS avg_active_energy_kcal,
@@ -62,7 +64,14 @@ SELECT
     ROUND(staged.total_step_count / NULLIF(staged.days_recorded, 0), 3) AS avg_step_count,
 
     workout_metrics.high_impact_workouts,
+    workout_metrics.strength_workouts,
+    workout_metrics.running_workouts,
     workout_metrics.total_miles_run,
+    workout_metrics.total_miles_run >= 10.0 AS running_goal_met,
+    
+    -- TODO: Calculate average pace correctly
+    -- AVG(workout_metrics.pace) AS avg_pace,
+    
     CURRENT_TIMESTAMP() AS _dbt_last_run_at
 
 

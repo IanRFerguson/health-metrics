@@ -20,6 +20,7 @@ WITH
                     workout_type,
                     high_impact,
                     distance_in_miles,
+                    pace,
                     total_energy,
                     active_energy,
                     max_heart_rate,

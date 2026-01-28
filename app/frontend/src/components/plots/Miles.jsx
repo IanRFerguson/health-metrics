@@ -10,7 +10,7 @@ export default function MilesPlot({ data, isDaily = false }) {
                 {data.map((entry, index) => (
                     <Cell
                         key={`cell-${index}`}
-                        fill={!isDaily ? (entry.total_miles_run >= 10 ? "#00BFC4" : "#F8766D") : "#00BFC4"}
+                        fill={!isDaily ? (entry.total_miles_run >= 10 ? "rgba(34, 197, 94, 0.8)" : "rgba(239, 68, 68, 0.8)") : "rgba(34, 197, 94, 0.8)"}
                     />
                 ))}
             </Bar>

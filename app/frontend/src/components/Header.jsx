@@ -26,7 +26,7 @@ function Header() {
     return (
         <header>
             <h1>Health Metrics {currentYear}</h1>
-            <p>Last updated {lastUpdated}</p>
+            <p>Models last updated {lastUpdated}</p>
         </header>
     );
 }

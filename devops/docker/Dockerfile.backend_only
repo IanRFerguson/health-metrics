@@ -1,13 +1,3 @@
-FROM node:20-bullseye AS build
-
-WORKDIR /app/frontend
-
-COPY ./app/frontend/package*.json ./
-RUN npm install
-
-COPY ./app/frontend . 
-RUN npm run build
-
 FROM python:3.12-bullseye
 
 WORKDIR /app
@@ -19,7 +9,6 @@ COPY ./app/backend .
 COPY ./common ./common
 
 RUN mkdir -p ./frontend/dist
-COPY --from=build /app/frontend/dist ./frontend/dist
 
 ENV PYTHONPATH="/app:/app/common"
 EXPOSE 5000

@@ -12,7 +12,19 @@ services:
     volumes:
       - ./service_accounts:/app/service_accounts:ro
       - ./data_dev:/tmp
-
+  backend:
+    build:
+      context: .
+      dockerfile: ./devops/docker/Dockerfile.backend_only
+    ports:
+      - "5000:5000"
+    env_file:
+      - .local/server.env
+    environment:
+      - STAGE=dev
+    volumes:
+      - ./service_accounts:/app/service_accounts:ro
+      - ./data_dev:/tmp
   pipeline-load:
     build:
       context: .
@@ -21,8 +33,7 @@ services:
       - .local/elt.env
     volumes:
       - ./service_accounts:/app/service_accounts:ro
-    command: ["python", "/app/src/health_data/main.py"]
-
+    command: ["uv", "run", "/app/src/health_data/main.py"]
   pipeline-shell:
     build:
       context: .

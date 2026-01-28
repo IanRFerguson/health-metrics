@@ -5,6 +5,8 @@ import { ResponsiveContainer } from 'recharts';
 import ExercisePlot from "./plots/Exercise";
 import WeightPlot from "./plots/Weight";
 import MilesPlot from "./plots/Miles";
+import MetricCards from "./MetricCards";
+import StatsTable from "./StatsTable";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -14,8 +16,8 @@ function HealthMetrics() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedMetric, setSelectedMetric] = useState('total_exercise_minutes');
-    const [dailyStats, setDailyStats] = useState(false);
+    const [selectedMetric, setSelectedMetric] = useState('total_miles_run');
+    const [dailyStats, setDailyStats] = useState(true);
 
     // This array informs our dropdown (that builds the plot)
     const metrics = [
@@ -138,6 +140,12 @@ function HealthMetrics() {
                     }}
                 />
             </div>
+
+            {/* Metric Cards */}
+            <MetricCards />
+
+            {/* Monthly Stats Table */}
+            <StatsTable />
         </div>
     );
 }
