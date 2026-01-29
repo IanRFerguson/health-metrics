@@ -46,7 +46,7 @@ WITH
         -- that the record with a higher active energy value is the more complete one
         QUALIFY ROW_NUMBER() OVER (
             PARTITION BY DATE(date_time), EXTRACT(HOUR FROM CAST(date_time AS TIMESTAMP))
-            ORDER BY active_energy__kcal DESC, utc_loaded_at DESC
+            ORDER BY CAST(active_energy__kcal AS FLOAT64) DESC, utc_loaded_at DESC
         ) = 1
     ),
 
