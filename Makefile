@@ -19,7 +19,6 @@ server-docker-push:
 		-f ./devops/docker/Dockerfile.server \
 		--platform linux/amd64 \
 		.
-
 	@docker push us-central1-docker.pkg.dev/ian-is-online/health-metrics/app-image:latest
 
 
@@ -38,5 +37,4 @@ pipeline-docker-push:
 		-f ./devops/docker/Dockerfile.pipe \
 		--platform linux/amd64 \
 		.
-
 	@docker push us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest
