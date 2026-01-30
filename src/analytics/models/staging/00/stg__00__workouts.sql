@@ -59,7 +59,7 @@ SELECT
     workout_start,
     workout_end,
     workout_duration,
-    SAFE.FORMAT_TIME('%M:%S', TIME_ADD(TIME '00:00:00', INTERVAL pace_seconds SECOND)) AS pace,
+    pace_seconds,
     high_impact,
     time_of_day,
     distance_in_miles,
