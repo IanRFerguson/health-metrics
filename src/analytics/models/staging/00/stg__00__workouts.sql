@@ -58,7 +58,7 @@ SELECT
     workout_type,
     workout_start,
     workout_end,
-    workout_duration,
+    CAST(workout_duration AS STRING) AS workout_duration,
     pace_seconds,
     high_impact,
     time_of_day,
