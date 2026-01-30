@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./StatsTable.css";
+import { CACHE_DURATION_MS } from "./Contstants";
 
 function StatsTable() {
     const [data, setData] = useState([]);
@@ -10,8 +11,6 @@ function StatsTable() {
         const fetchMonthlyStats = async () => {
             setLoading(true);
             try {
-                // We'll utilize a simple caching mechanism similar to HealthMetrics
-                const cacheDuration = 5 * 60 * 1000; // 5 minutes
                 const cacheKey = 'monthly_stats';
                 const cacheTimestampKey = `${cacheKey}_timestamp`;
 
@@ -20,7 +19,7 @@ function StatsTable() {
 
                 if (cachedData && cacheTimestamp) {
                     const age = Date.now() - parseInt(cacheTimestamp);
-                    if (age < cacheDuration) {
+                    if (age < CACHE_DURATION_MS) {
                         setData(JSON.parse(cachedData));
                         setLoading(false);
                         return;

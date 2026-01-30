@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { ResponsiveContainer } from 'recharts';
 
 // We've broken these into individual components for maximum customizability
-import ExercisePlot from "./plots/Exercise";
-import WeightPlot from "./plots/Weight";
 import MilesPlot from "./plots/Miles";
-import MetricCards from "./MetricCards";
-import StatsTable from "./StatsTable";
+import WeightPlot from "./plots/Weight";
+import WorkoutsPlot from "./plots/Workouts.jsx";
+import StepCountPlot from "./plots/StepCount.jsx";
 
-// Cache duration in milliseconds (5 minutes)
-const CACHE_DURATION = 5 * 60 * 1000;
+
+import { CACHE_DURATION_MS } from "./Contstants.js";
 
 function HealthMetrics() {
     // These state variables manage data fetching and UI state
@@ -21,9 +20,10 @@ function HealthMetrics() {
 
     // This array informs our dropdown (that builds the plot)
     const metrics = [
-        { key: 'total_exercise_minutes', plot_component: ExercisePlot, label: 'Total Exercise Minutes' },
-        { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
         { key: 'total_miles_run', plot_component: MilesPlot, label: 'Miles Run' },
+        { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
+        { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts' },
+        { key: 'step_count', plot_component: StepCountPlot, label: 'Step Count' },
     ];
 
     useEffect(() => {
@@ -44,7 +44,7 @@ function HealthMetrics() {
                 // If cached data exists and is fresh, use it instead of calling the API again
                 if (cached && cacheTimestamp) {
                     const age = Date.now() - parseInt(cacheTimestamp);
-                    if (age < CACHE_DURATION) {
+                    if (age < CACHE_DURATION_MS) {
                         console.log(`Using cached ${dailyStats ? 'daily' : 'weekly'} data (${Math.round(age / 1000)}s old)`);
                         setData(JSON.parse(cached));
                         setLoading(false);
@@ -140,12 +140,6 @@ function HealthMetrics() {
                     }}
                 />
             </div>
-
-            {/* Metric Cards */}
-            <MetricCards />
-
-            {/* Monthly Stats Table */}
-            <StatsTable />
         </div>
     );
 }

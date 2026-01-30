@@ -1,0 +1,1 @@
+export const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes

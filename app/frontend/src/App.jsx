@@ -1,6 +1,6 @@
 import './App.css'
 import Header from './components/Header.jsx';
-import HealthMetrics from './components/HealthMetrics.jsx';
+import Dashboard from './components/Dashboard.jsx';
 import PasswordGate from './components/PasswordGate.jsx';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
         <Header />
       </div>
       <div>
-        <HealthMetrics />
+        <Dashboard />
       </div>
     </>
   );
