@@ -1,3 +1,9 @@
+{{
+    config(
+        alias="metrics_per_day"
+    )
+}}
+
 WITH base AS (
     SELECT * FROM {{ ref("stg__01__health_metrics") }}
 ),

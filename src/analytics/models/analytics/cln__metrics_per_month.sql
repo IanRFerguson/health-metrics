@@ -1,3 +1,9 @@
+{{
+    config(
+        alias="metrics_per_month"
+    )
+}}
+
 -- NOTE: In a refactor we might build these into staging or intermediate models
 -- Not the best to do all of this logic in the analytical layer, but for now it's acceptable
 WITH
