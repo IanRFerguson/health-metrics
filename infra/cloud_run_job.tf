@@ -13,8 +13,8 @@ resource "google_cloud_run_v2_job" "load_job" {
       containers {
         image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
-        command = ["python"]
-        args    = ["/app/src/health_data/main.py"]
+        command = ["uv"]
+        args    = ["run", "/app/src/health_data/main.py"]
 
         env {
           name  = "STAGE"
@@ -49,7 +49,7 @@ resource "google_cloud_run_v2_job" "transform_job" {
       containers {
         image   = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
         command = ["/bin/sh", "-c"]
-        args    = ["cd /app/src/analytics && dbt build -t cloud"]
+        args    = ["cd /app/src/analytics && uv run dbt build -t cloud"]
 
         env {
           name  = "DBT_PROFILES_DIR"

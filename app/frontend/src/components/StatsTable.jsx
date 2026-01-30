@@ -10,10 +10,29 @@ function StatsTable() {
         const fetchMonthlyStats = async () => {
             setLoading(true);
             try {
+                // We'll utilize a simple caching mechanism similar to HealthMetrics
+                const cacheDuration = 5 * 60 * 1000; // 5 minutes
+                const cacheKey = 'monthly_stats';
+                const cacheTimestampKey = `${cacheKey}_timestamp`;
+
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const cacheTimestamp = sessionStorage.getItem(cacheTimestampKey);
+
+                if (cachedData && cacheTimestamp) {
+                    const age = Date.now() - parseInt(cacheTimestamp);
+                    if (age < cacheDuration) {
+                        setData(JSON.parse(cachedData));
+                        setLoading(false);
+                        return;
+                    }
+                }
+
                 const response = await fetch('/api/monthly-stats');
                 if (!response.ok) throw new Error('Failed to fetch monthly stats');
                 const result = await response.json();
                 setData(result);
+                sessionStorage.setItem(cacheKey, JSON.stringify(result));
+                sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
             } catch (err) {
                 setError(err.message);
             } finally {

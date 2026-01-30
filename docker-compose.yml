@@ -33,7 +33,8 @@ services:
       - .local/elt.env
     volumes:
       - ./service_accounts:/app/service_accounts:ro
-    command: ["uv", "run", "/app/src/health_data/main.py"]
+      - ./devops:/app/devops:ro
+    command: ["bash", "/app/devops/run_pipeline.sh"]
   pipeline-shell:
     build:
       context: .
