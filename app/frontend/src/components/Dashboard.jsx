@@ -1,6 +1,6 @@
-import HealthMetrics from "./HealthMetrics";
-import MetricCards from "./MetricCards";
-import StatsTable from "./StatsTable";
+import HealthMetrics from "./health_metrics/HealthMetrics";
+import MetricCards from "./metric_cards/MetricCards";
+import StatsTable from "./stats_table/StatsTable";
 
 function Dashboard() {
     return (

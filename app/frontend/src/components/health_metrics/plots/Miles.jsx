@@ -4,7 +4,7 @@ import CustomTooltip from './CustomTooltip';
 const dailyTooltipSeries = [
     {
         dataKey: "total_miles_run",
-        label: "Total Miles Run",
+        label: "Distance",
         color: "#8884d8"
     },
     {
@@ -13,7 +13,6 @@ const dailyTooltipSeries = [
             const runningWorkout = data.all_daily_workouts?.find(w => w.workout_type?.includes('RUN'));
             return runningWorkout?.workout_duration;
         },
-        unit: " mins",
         color: "#8884d8"
     },
     {
@@ -29,7 +28,7 @@ const dailyTooltipSeries = [
 const weeklyTooltipSeries = [
     {
         dataKey: "total_miles_run",
-        label: "Total Miles Run",
+        label: "Distance",
         color: "#8884d8"
     },
     {
