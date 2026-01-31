@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, request
 
 from common.logger import metrics_logger
 
@@ -63,3 +63,46 @@ def get_weekly_running_goal_met():
     )
 
     return jsonify({"pct_weeks_running_goal_met": pct_weeks_running_goal_met})
+
+
+@bp.route("/workout-stats", methods=["GET"])
+def get_workout_stats():
+    """
+    This endpoint retrieves workout statistics
+    from the analytical dbt models in BigQuery.
+    """
+
+    metrics_logger.info("Fetching workout stats from BigQuery")
+
+    if request.args.get("daily") == "true":
+        metrics_logger.debug("Daily stats requested")
+        query = """
+            SELECT 
+                *
+            FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
+            WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
+            ORDER BY target_date ASC
+            """
+
+    else:
+        metrics_logger.debug("Weekly stats requested")
+        query = """
+            SELECT 
+                date,
+                total_miles_run,
+                all_daily_workouts
+            FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_day`
+            WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())
+            ORDER BY target_date ASC
+            """
+    ###
+
+    metrics_logger.debug(f"Executing query: {query}")
+
+    query_job = BQ_CLIENT.query(query)
+    results = query_job.result()
+
+    data = [dict(row) for row in results]
+    metrics_logger.info(f"Retrieved {len(data)} records from BigQuery")
+
+    return jsonify({"workout_stats": data})

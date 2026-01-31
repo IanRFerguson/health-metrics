@@ -22,9 +22,12 @@ function HealthMetrics() {
     const metrics = [
         { key: 'total_miles_run', plot_component: MilesPlot, label: 'Miles Run' },
         { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
-        { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts' },
+        { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts', endpoint: '/api/workout-stats?daily={daily}' },
         { key: 'step_count', plot_component: StepCountPlot, label: 'Step Count' },
     ];
+
+    // This is the value that's currently selected from the dropdown
+    const currentMetric = metrics.find(m => m.key === selectedMetric);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -34,8 +37,14 @@ function HealthMetrics() {
             // Indicate loading state
             setLoading(true);
             try {
-                const endpoint = dailyStats ? '/api/daily-stats' : '/api/weekly-stats';
-                const cacheKey = `stats_${dailyStats ? 'daily' : 'weekly'}`;
+                /*
+                    The basic logic here is to determine the correct API endpoint based on the selected metric.
+                    If the metric has a specific endpoint, we use that (replacing {daily} as needed).
+                    Otherwise, we default to either /api/daily-stats or /api/weekly-stats based on the dailyStats toggle.
+                */
+                const endpoint = currentMetric.endpoint ? currentMetric.endpoint.replace('{daily}', dailyStats) : (dailyStats ? '/api/daily-stats' : '/api/weekly-stats');
+
+                const cacheKey = currentMetric.endpoint ? `stats_${selectedMetric}_${dailyStats ? 'daily' : 'weekly'}` : `stats_${dailyStats ? 'daily' : 'weekly'}`;
 
                 // Check cache first
                 const cached = sessionStorage.getItem(cacheKey);
@@ -53,6 +62,7 @@ function HealthMetrics() {
                 }
 
                 // Fetch fresh data
+                console.log(`Fetching fresh ${dailyStats ? 'daily' : 'weekly'} data from ${endpoint}`);
                 const response = await fetch(endpoint);
                 if (!response.ok) throw new Error(`Failed to fetch ${dailyStats ? 'daily' : 'weekly'} stats`);
                 const result = await response.json();
@@ -91,13 +101,11 @@ function HealthMetrics() {
             }
         };
         fetchStats();
-    }, [dailyStats]);
+    }, [dailyStats, selectedMetric]); // Added selectedMetric to dependencies
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    // This is the value that's currently selected from the dropdown
-    const currentMetric = metrics.find(m => m.key === selectedMetric);
     const PlotComponent = currentMetric.plot_component;
 
     return (

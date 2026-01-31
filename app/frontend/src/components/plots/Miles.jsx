@@ -44,6 +44,10 @@ const weeklyTooltipSeries = [
     }
 ];
 
+export default function MilesPlot({ data, isDaily = false }) {
+    return isDaily ? dailyMilesPlot(data, isDaily) : weeklyMilesPlot(data, isDaily);
+}
+
 function dailyMilesPlot(data, isDaily) {
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -63,7 +67,7 @@ function dailyMilesPlot(data, isDaily) {
             </Bar>
         </BarChart>
     );
-};
+}
 
 function weeklyMilesPlot(data, isDaily) {
     return (
@@ -84,8 +88,4 @@ function weeklyMilesPlot(data, isDaily) {
             </Bar>
         </BarChart>
     );
-};
-
-export default function MilesPlot({ data, isDaily = false }) {
-    return isDaily ? dailyMilesPlot(data, isDaily) : weeklyMilesPlot(data, isDaily);
 }
