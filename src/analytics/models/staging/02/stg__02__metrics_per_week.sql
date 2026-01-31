@@ -17,7 +17,8 @@ WITH
                         ELSE 0 
                     END
                 ), 
-            3) AS total_miles_run
+            3) AS total_miles_run,
+            {{ format_pace_string("COALESCE(CAST(AVG(dw.pace_seconds) AS INT64), 0)") }} AS pace
 
         FROM base
         LEFT JOIN UNNEST(base.daily_workouts) AS dw
@@ -68,9 +69,7 @@ SELECT
     workout_metrics.running_workouts,
     workout_metrics.total_miles_run,
     workout_metrics.total_miles_run >= 10.0 AS running_goal_met,
-    
-    -- TODO: Calculate average pace correctly
-    -- AVG(workout_metrics.pace) AS avg_pace,
+    workout_metrics.pace AS avg_pace,
     
     CURRENT_TIMESTAMP() AS _dbt_last_run_at
 

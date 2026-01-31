@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import "./StatsTable.css";
 import { CACHE_DURATION_MS } from "./Contstants";
 
+function tidyColumnName(name) {
+    return name.replace(/_/g, ' ').replace(/pct/gi, '%').replace(/avg/gi, 'Average').toUpperCase();
+}
+
 function StatsTable() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -110,16 +114,16 @@ function StatsTable() {
                 <table className="stats-table">
                     <thead>
                         <tr>
-                            <th>Month</th>
+                            <th>MONTH</th>
                             {columns.map(col => (
-                                <th key={col}>{col.replace(/_/g, ' ')}</th>
+                                <th key={col}>{tidyColumnName(col)}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((row, idx) => (
                             <tr key={idx}>
-                                <td>{formatMonth(row.year, row.month)}</td>
+                                <td>{formatMonth(row.year, row.month).toUpperCase()}</td>
                                 {columns.map(col => (
                                     <td key={col} style={getCellStyle(row[col], col)}>
                                         {row[col] !== null && row[col] !== undefined
