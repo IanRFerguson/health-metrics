@@ -35,7 +35,6 @@ const formatMinutesToTime = (minutes) => {
 };
 
 export default function WorkoutsPlot({ data, isDaily = false }) {
-    console.log(data);
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey="target_date" />
