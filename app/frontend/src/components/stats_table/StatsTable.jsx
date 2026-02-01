@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./StatsTable.css";
-import { CACHE_DURATION_MS } from "../Contstants";
+import { CACHE_DURATION_MS } from "../Constants.js";
 
 function tidyColumnName(name) {
     return name.replace(/_/g, ' ').replace(/pct/gi, '%').replace(/avg/gi, 'Average').toUpperCase();

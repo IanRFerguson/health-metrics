@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./MetricCards.css";
-import { CACHE_DURATION_MS } from "../Contstants.js";
+import { CACHE_DURATION_MS } from "../Constants.js";
 
 function MetricCards() {
     const [totalMiles, setTotalMiles] = useState(null);

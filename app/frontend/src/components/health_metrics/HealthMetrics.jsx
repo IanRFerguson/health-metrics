@@ -8,7 +8,7 @@ import WorkoutsPlot from "./plots/Workouts.jsx";
 import StepCountPlot from "./plots/StepCount.jsx";
 
 
-import { CACHE_DURATION_MS } from "../Contstants.js";
+import { CACHE_DURATION_MS } from "../Constants.js";
 
 function formatStandardData(apiResponseData) {
     // Validate input
