@@ -1,13 +1,27 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import CustomTooltip from './CustomTooltip';
+
+const tooltipSeries = [
+    {
+        dataKey: "max_weight_lb",
+        label: "Maximum Weight",
+        unit: " lb",
+        color: "#3b82f6"
+    },
+    {
+        dataKey: "min_weight_lb",
+        label: "Minimum Weight",
+        unit: " lb",
+        color: "#82ca9d"
+    },
+];
 
 export default function WeightPlot({ data, isDaily = false }) {
     return (
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="start_date" />
             <YAxis domain={['auto', 'auto']} />
-            <Tooltip content={<CustomTooltip isDaily={isDaily} />} />
+            <Tooltip content={<CustomTooltip isDaily={isDaily} series={tooltipSeries} />} />
             <Legend />
 
             {/* 
@@ -15,7 +29,7 @@ export default function WeightPlot({ data, isDaily = false }) {
                 since min and avg weights are less meaningful on a daily basis.
             */}
             {!isDaily && (<Line
-                type="monotone"
+                type="linear"
                 dataKey={"min_weight_lb"}
                 stroke={"#82ca9d"}
                 name={"Minimum Weight"}
@@ -24,7 +38,7 @@ export default function WeightPlot({ data, isDaily = false }) {
             />)}
 
             <Line
-                type="monotone"
+                type="linear"
                 dataKey={"max_weight_lb"}
                 stroke={"#3b82f6"}
                 name={"Maximum Weight"}

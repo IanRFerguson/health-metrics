@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./MetricCards.css";
+import { CACHE_DURATION_MS } from "../Constants.js";
 
 function MetricCards() {
     const [totalMiles, setTotalMiles] = useState(null);
@@ -9,8 +10,6 @@ function MetricCards() {
     useEffect(() => {
         const fetchMetrics = async () => {
             try {
-                // Here we'll utilize a cache duration similar to HealthMetrics
-                const cacheDuration = 5 * 60 * 1000; // 5 minutes
                 const cacheKeyMiles = 'metric_total_miles_run';
                 const cacheKeyGoal = 'metric_weekly_running_goal_met';
 
@@ -24,7 +23,7 @@ function MetricCards() {
 
                 if (cachedMiles && cacheTimestampMiles) {
                     const age = Date.now() - parseInt(cacheTimestampMiles);
-                    if (age < cacheDuration) {
+                    if (age < CACHE_DURATION_MS) {
                         useCacheMiles = true;
                         setTotalMiles(JSON.parse(cachedMiles));
                     }
@@ -32,7 +31,7 @@ function MetricCards() {
 
                 if (cachedGoal && cacheTimestampGoal) {
                     const age = Date.now() - parseInt(cacheTimestampGoal);
-                    if (age < cacheDuration) {
+                    if (age < CACHE_DURATION_MS) {
                         useCacheGoal = true;
                         setWeeklyGoal(JSON.parse(cachedGoal));
                     }
@@ -88,12 +87,12 @@ function MetricCards() {
                 </div>
             </div>
 
-            <div className="metric-card">
+            {/* <div className="metric-card">
                 <div className="metric-label">Coming Soon</div>
                 <div className="metric-value">
                     {loading ? '...' : '—'}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

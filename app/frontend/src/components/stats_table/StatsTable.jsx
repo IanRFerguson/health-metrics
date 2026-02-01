@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import "./StatsTable.css";
+import { CACHE_DURATION_MS } from "../Constants.js";
+
+function tidyColumnName(name) {
+    return name.replace(/_/g, ' ').replace(/pct/gi, '%').replace(/avg/gi, 'Average').toUpperCase();
+}
 
 function StatsTable() {
     const [data, setData] = useState([]);
@@ -10,8 +15,6 @@ function StatsTable() {
         const fetchMonthlyStats = async () => {
             setLoading(true);
             try {
-                // We'll utilize a simple caching mechanism similar to HealthMetrics
-                const cacheDuration = 5 * 60 * 1000; // 5 minutes
                 const cacheKey = 'monthly_stats';
                 const cacheTimestampKey = `${cacheKey}_timestamp`;
 
@@ -20,7 +23,7 @@ function StatsTable() {
 
                 if (cachedData && cacheTimestamp) {
                     const age = Date.now() - parseInt(cacheTimestamp);
-                    if (age < cacheDuration) {
+                    if (age < CACHE_DURATION_MS) {
                         setData(JSON.parse(cachedData));
                         setLoading(false);
                         return;
@@ -111,16 +114,16 @@ function StatsTable() {
                 <table className="stats-table">
                     <thead>
                         <tr>
-                            <th>Month</th>
+                            <th>MONTH</th>
                             {columns.map(col => (
-                                <th key={col}>{col.replace(/_/g, ' ')}</th>
+                                <th key={col}>{tidyColumnName(col)}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((row, idx) => (
                             <tr key={idx}>
-                                <td>{formatMonth(row.year, row.month)}</td>
+                                <td>{formatMonth(row.year, row.month).toUpperCase()}</td>
                                 {columns.map(col => (
                                     <td key={col} style={getCellStyle(row[col], col)}>
                                         {row[col] !== null && row[col] !== undefined
