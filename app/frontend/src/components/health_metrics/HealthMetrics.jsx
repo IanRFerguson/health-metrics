@@ -54,7 +54,7 @@ function formatStandardData(apiResponseData) {
 function formatWorkoutsData(apiResponse) {
     // Validate input
     if (!Array.isArray(apiResponse)) {
-        console.warn('formatStandardData expected array but got:', typeof apiResponse, apiResponse);
+        console.warn('formatWorkoutsData expected array but got:', typeof apiResponse, apiResponse);
         return [];
     }
 
@@ -83,10 +83,29 @@ function formatWorkoutsData(apiResponse) {
             }
         }
 
+        // Convert workout_duration from string (HH:MM:SS or MM:SS) to minutes
+        let durationMinutes = 0;
+        if (item.workout_duration) {
+            try {
+                const parts = item.workout_duration.split(':');
+                if (parts.length === 3) {
+                    // HH:MM:SS format
+                    durationMinutes = parseInt(parts[0]) * 60 + parseInt(parts[1]) + parseInt(parts[2]) / 60;
+                } else if (parts.length === 2) {
+                    // MM:SS format
+                    durationMinutes = parseInt(parts[0]) + parseInt(parts[1]) / 60;
+                }
+            } catch (parseError) {
+                console.warn('Duration parsing error for:', item.workout_duration, parseError);
+            }
+        }
+
         return {
             ...item,
             target_date: formattedDate,
             workout_count: Number(item.workout_count) || 0,
+            workout_duration_minutes: durationMinutes,
+            workout_duration_original: item.workout_duration,
         };
     });
 }

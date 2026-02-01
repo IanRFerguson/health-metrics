@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CACHE_DURATION_MS } from "./Contstants";
 
 
 function Header() {
@@ -12,10 +13,26 @@ function Header() {
     useEffect(() => {
         const fetchLastUpdated = async () => {
             try {
+                const cacheKey = 'last_updated_at';
+                const cacheTimestampKey = `${cacheKey}_timestamp`;
+
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const cacheTimestamp = sessionStorage.getItem(cacheTimestampKey);
+
+                if (cachedData && cacheTimestamp) {
+                    const age = Date.now() - parseInt(cacheTimestamp);
+                    if (age < CACHE_DURATION_MS) {
+                        setLastUpdated(cachedData);
+                        return;
+                    }
+                }
+
                 const response = await fetch('/api/last-updated-at');
                 if (!response.ok) throw new Error('Failed to fetch last updated time');
                 const result = await response.json();
                 setLastUpdated(new Date(result.last_updated_at).toLocaleString());
+                sessionStorage.setItem(cacheKey, new Date(result.last_updated_at).toLocaleString());
+                sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
             } catch (err) {
                 console.error(err);
             }

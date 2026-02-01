@@ -105,4 +105,4 @@ def get_workout_stats():
     data = [dict(row) for row in results]
     metrics_logger.info(f"Retrieved {len(data)} records from BigQuery")
 
-    return jsonify({"workout_stats": data})
+    return jsonify(data)

@@ -51,7 +51,7 @@ function dailyMilesPlot(data, isDaily) {
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey="start_date" />
-            <YAxis domain={['auto', 'auto']} />
+            <YAxis domain={["auto", "auto"]} />
             <Tooltip
                 content={<CustomTooltip isDaily={isDaily} series={dailyTooltipSeries} />}
                 cursor={{ fill: 'transparent' }}
@@ -72,7 +72,7 @@ function weeklyMilesPlot(data, isDaily) {
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey="start_date" />
-            <YAxis domain={['auto', 'auto']} />
+            <YAxis domain={["auto", "auto"]} />
             <Tooltip
                 content={<CustomTooltip isDaily={isDaily} series={weeklyTooltipSeries} />}
                 cursor={{ fill: 'transparent' }}
