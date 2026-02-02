@@ -50,6 +50,7 @@ def get_weekly_running_goal_met():
         COUNTIF(running_goal_met) / COUNT(*) AS pct_weeks_running_goal_met
     FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_week`
     WHERE EXTRACT(YEAR FROM start_date) = EXTRACT(YEAR FROM CURRENT_DATE())
+        AND NOT _is_current_week
     """
     metrics_logger.debug(f"Executing query: {query}")
 
@@ -74,28 +75,16 @@ def get_workout_stats():
 
     metrics_logger.info("Fetching workout stats from BigQuery")
 
-    if request.args.get("daily") == "true":
-        metrics_logger.debug("Daily stats requested")
-        query = """
-            SELECT 
-                *
-            FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
-            WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
-            ORDER BY target_date ASC
-            """
+    if not request.args.get("daily") == "true":
+        metrics_logger.warning("No weekly enpoint exists, defaulting to daily stats")
 
-    else:
-        metrics_logger.debug("Weekly stats requested")
-        query = """
-            SELECT 
-                date,
-                total_miles_run,
-                all_daily_workouts
-            FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_day`
-            WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE())
-            ORDER BY target_date ASC
-            """
-    ###
+    query = """
+        SELECT 
+            *
+        FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
+        WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
+        ORDER BY target_date ASC
+        """
 
     metrics_logger.debug(f"Executing query: {query}")
 

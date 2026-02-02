@@ -71,7 +71,8 @@ SELECT
     workout_metrics.total_miles_run >= 10.0 AS running_goal_met,
     workout_metrics.pace AS avg_pace,
     
-    CURRENT_TIMESTAMP() AS _dbt_last_run_at
+    CURRENT_TIMESTAMP() AS _dbt_last_run_at,
+    DATE_TRUNC(CURRENT_DATE(), WEEK(MONDAY)) = staged.start_date AS _is_current_week
 
 
 FROM staged
