@@ -35,6 +35,16 @@ services:
       - ./service_accounts:/app/service_accounts:ro
       - ./devops:/app/devops:ro
     command: ["bash", "/app/devops/run_pipeline.sh"]
+  pipeline-load-full-refresh:
+    build:
+      context: .
+      dockerfile: ./devops/docker/Dockerfile.pipe
+    env_file:
+      - .local/elt.env
+    volumes:
+      - ./service_accounts:/app/service_accounts:ro
+      - ./devops:/app/devops:ro
+    command: ["bash", "/app/devops/run_pipeline.sh", "--full-refresh"]
   pipeline-shell:
     build:
       context: .

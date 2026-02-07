@@ -23,7 +23,11 @@ server-docker-push:
 
 
 pipeline:
-	@docker compose up pipeline-load --build
+	@if [ "${refresh}" = "true" ]; then \
+		docker compose up pipeline-load-full-refresh --build; \
+	else \
+		docker compose up pipeline-load --build; \
+	fi
 
 
 pipeline-shell:
