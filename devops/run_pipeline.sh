@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ $1 == "--full-refresh" ]; then
+if [[ $1 == "--full-refresh" ]]; then
     PIPELINE_CMD="uv run /app/src/health_data/main.py --full-refresh"
     DBT_CMD="uv run dbt build --full-refresh"
 else
