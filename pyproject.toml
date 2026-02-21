@@ -16,6 +16,7 @@ dependencies = [
     "google-cloud-bigquery",
     "google-cloud-logging",
     "pandas",
+    "resend>=2.22.0",
 ]
 
 
