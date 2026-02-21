@@ -12,3 +12,22 @@ variable "MY_EMAIL_ADDRESS" {
   description = "Email address to receive alert notifications."
   type        = string
 }
+
+variable "EMAIL_SUMMARIES_TRIGGER_KEY" {
+  description = "API key for triggering email summaries."
+  type        = string
+  sensitive   = true
+}
+
+variable "RESEND_API_KEY" {
+  description = "API key for Resend email service."
+  type        = string
+  sensitive   = true
+}
+
+variable "GEMINI_API_KEY" {
+  description = "API key for Gemini AI service."
+  type        = string
+  sensitive   = true
+}
+

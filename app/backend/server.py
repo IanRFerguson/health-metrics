@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from routes.api import bp as api_blueprint
+from routes.notifications.email_summaries import bp as email_summaries_blueprint
 from routes.webhook import bp as webhook_blueprint
 
 from common.logger import metrics_logger
@@ -22,3 +23,4 @@ def index():
 
 server.register_blueprint(api_blueprint)
 server.register_blueprint(webhook_blueprint)
+server.register_blueprint(email_summaries_blueprint)

@@ -41,6 +41,21 @@ resource "google_cloud_run_v2_service" "health_metrics_app" {
         name  = "WEBHOOK_API_KEY"
         value = var.WEBHOOK_API_KEY
       }
+
+      env {
+        name  = "RESEND_API_KEY"
+        value = var.RESEND_API_KEY
+      }
+
+      env {
+        name  = "EMAIL_SUMMARIES_TRIGGER_KEY"
+        value = var.EMAIL_SUMMARIES_TRIGGER_KEY
+      }
+
+      env {
+        name  = "GEMINI_API_KEY"
+        value = var.GEMINI_API_KEY
+      }
     }
   }
 }

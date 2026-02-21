@@ -16,7 +16,10 @@ locals {
     "dataproc.worker",
     "monitoring.notificationChannelEditor",
     "monitoring.alertPolicyEditor",
-    "workflows.invoker"
+    "workflows.invoker",
+    "workflows.admin",
+    "resourcemanager.projectIamAdmin",
+    "cloudscheduler.admin"
   ]
 }
 
