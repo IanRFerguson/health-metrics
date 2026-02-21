@@ -61,7 +61,9 @@ def read_dataframe_from_gcs(
         blob.download_to_filename(temp_file.name)
 
         # Read the data into a Polars DataFrame
-        df: pl.DataFrame = pl.DataFrame._read_csv(temp_file.name, infer_schema_length=10000)
+        df: pl.DataFrame = pl.DataFrame._read_csv(
+            temp_file.name, infer_schema_length=10000
+        )
 
     # Standardize column names to remove any problematic characters
     for col in df.columns:
