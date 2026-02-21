@@ -21,7 +21,7 @@ COPY ./common ./common
 RUN mkdir -p ./frontend/dist
 COPY --from=build /app/frontend/dist ./frontend/dist
 
-ENV PYTHONPATH="/app:/app/common"
+ENV PYTHONPATH="/app:/app/common:/app/app"
 EXPOSE 5000
 
 CMD ["uv", "run", "gunicorn", "-b", "0.0.0.0:5000", "--timeout", "300", "wsgi"]
