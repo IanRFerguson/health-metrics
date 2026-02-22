@@ -1,0 +1,5 @@
+sources:
+  - name: gemini_models
+    schema: dbt_health_metrics_staging
+    tables:
+      - name: stg__02__food_intake_scored
