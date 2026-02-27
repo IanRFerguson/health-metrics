@@ -2,6 +2,14 @@ FROM python:3.12-bullseye
 
 WORKDIR /app
 
+# Install dbt-fusion engine
+RUN export SHELL=/bin/bash && \
+    curl -fsSL https://public.cdn.getdbt.com/fs/install/install.sh | sh -s -- --update
+
+# Add dbt binary to PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Install Python dependencies
 COPY pyproject.toml uv.lock ./
 RUN pip install uv==0.5.11 && uv sync --frozen
 

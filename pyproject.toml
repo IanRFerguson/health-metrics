@@ -5,7 +5,6 @@ description = "A data pipeline and full-stack web application to track my fitnes
 readme = "README.md"
 requires-python = "~=3.12.0"
 dependencies = [
-    "dbt-bigquery",
     "bigframes",
     "klondike",
     "click==8.3.1",
