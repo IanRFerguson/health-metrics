@@ -33,6 +33,10 @@ models:
     staging:
       +schema: health_metrics_staging
       +tags: ["staging"]
+      "01":
+        +tags: ["pre_gemini"]
+      "02":
+        +tags: ["post_gemini"]
 
     analytics:
       +schema: health_metrics_analytics

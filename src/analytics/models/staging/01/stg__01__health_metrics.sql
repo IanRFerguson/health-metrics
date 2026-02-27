@@ -4,7 +4,18 @@ WITH
 
             load_date AS target_date,
             time_of_day,
-            ARRAY_AGG(food_line_item) AS food_line_items
+            ARRAY_AGG(
+                STRUCT(
+                    food_line_item,
+                    {{ 
+                        dbt_utils.generate_surrogate_key(
+                            [
+                                "food_line_item"
+                            ]
+                        )
+                    }} AS surrogate_line_item_pk
+                )
+            ) AS food_line_items
 
         FROM {{ ref("stg__00__food_journal") }}
         GROUP BY ALL

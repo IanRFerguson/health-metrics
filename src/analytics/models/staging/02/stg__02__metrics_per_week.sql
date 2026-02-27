@@ -1,6 +1,26 @@
 WITH
+    -- NOTE: We might want to flip this over to the 02 model at some point
     base AS (
-        SELECT * FROM {{ ref("stg__01__health_metrics") }}
+        SELECT
+            {{
+                dbt_utils.star(
+                    ref("stg__01__health_metrics")
+                )
+            }}
+        FROM {{ ref("stg__01__health_metrics") }}
+    ),
+
+    food_scores AS (
+        SELECT
+        
+            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+            SUM(total_food_score) AS total_food_score,
+            SUM(total_food_score) / COUNT(DISTINCT target_date) AS avg_food_score,
+            MIN(min_food_score) AS min_food_score,
+            MAX(max_food_score) AS max_food_score
+        
+        FROM {{ ref("stg__02__metrics_per_day") }}
+        GROUP BY 1
     ),
 
     workout_metrics AS (
@@ -43,11 +63,13 @@ WITH
             ROUND(AVG(weight_lb), 3) AS avg_weight_lb,
             MAX(weight_lb) AS max_weight_lb,
             
-            NULL AS food_score,
+            SUM(total_food_score) / COUNT(*) AS food_score,
 
             COUNT(*) AS days_recorded
         
         FROM base
+        LEFT JOIN food_scores
+            ON DATE_TRUNC(base.target_date, WEEK(MONDAY)) = food_scores.start_date
         GROUP BY 1
     )
 
