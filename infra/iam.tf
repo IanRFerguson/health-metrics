@@ -17,9 +17,6 @@ locals {
     "monitoring.notificationChannelEditor",
     "monitoring.alertPolicyEditor",
     "workflows.invoker",
-    "workflows.admin",
-    "resourcemanager.projectIamAdmin",
-    "cloudscheduler.admin"
   ]
 }
 
