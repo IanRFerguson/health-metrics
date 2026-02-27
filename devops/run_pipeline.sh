@@ -3,10 +3,10 @@ set -e
 
 if [[ $1 == "--full-refresh" ]]; then
     PIPELINE_CMD="uv run /app/src/health_data/main.py --full-refresh"
-    DBT_CMD="uv run dbt build --full-refresh"
+    DBT_CMD="dbt build --full-refresh"
 else
     PIPELINE_CMD="uv run /app/src/health_data/main.py"
-    DBT_CMD="uv run dbt build"
+    DBT_CMD="dbt build"
 fi
 
 # Run the health data pipeline to load
