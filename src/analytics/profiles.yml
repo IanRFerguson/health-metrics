@@ -7,7 +7,7 @@ health_metrics:
       project: ian-is-online
       dataset: dbt
       threads: 4
-      keyfile: /app/service_accounts/ian-is-online-e8d79794493b.json
+      keyfile: ../../service_accounts/ian-is-online-e8d79794493b.json
       location: us
     
     cloud:
