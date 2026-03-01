@@ -45,10 +45,22 @@
     .metric-cards-container {
         flex-direction: column;
         align-items: center;
+        width: 95%;
+        gap: 12px;
+        margin: 20px auto;
     }
 
     .metric-card {
         max-width: 100%;
         width: 100%;
+        padding: 16px;
+    }
+
+    .metric-value {
+        font-size: 28px;
+    }
+
+    .metric-label {
+        font-size: 12px;
     }
 }
