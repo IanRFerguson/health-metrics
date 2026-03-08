@@ -124,7 +124,6 @@ function HealthMetrics() {
         { key: 'total_miles_run', plot_component: MilesPlot, label: 'Miles Run' },
         { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
         { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts', endpoint: '/api/workout-stats?daily={daily}', formatFn: formatWorkoutsData },
-        { key: 'step_count', plot_component: StepCountPlot, label: 'Step Count' },
     ];
 
     // This is the value that's currently selected from the dropdown
