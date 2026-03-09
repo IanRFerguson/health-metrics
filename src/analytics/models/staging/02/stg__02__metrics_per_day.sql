@@ -22,9 +22,8 @@ WITH
     weight_modeled AS (
         SELECT
             target_date,
-            COALESCE(
-                max_weight_lb,
-                LAG(max_weight_lb) OVER (ORDER BY target_date)
+            LAST_VALUE(max_weight_lb IGNORE NULLS) OVER (
+                ORDER BY target_date
             ) AS max_weight_lb
         FROM weight_raw
     ),
