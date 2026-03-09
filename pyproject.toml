@@ -16,6 +16,7 @@ dependencies = [
     "google-cloud-logging",
     "pandas",
     "resend>=2.22.0",
+    "google-genai>=1.65.0",
 ]
 
 

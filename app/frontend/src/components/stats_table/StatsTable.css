@@ -56,3 +56,21 @@
 .stats-table td {
     transition: background-color 0.2s ease;
 }
+
+@media (max-width: 768px) {
+    .stats-table-container {
+        width: 95%;
+        padding: 12px;
+        margin: 20px auto;
+    }
+
+    .stats-table th,
+    .stats-table td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .stats-table-container h3 {
+        font-size: 15px;
+    }
+}
