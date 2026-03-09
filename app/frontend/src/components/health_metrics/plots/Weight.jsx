@@ -29,21 +29,21 @@ export default function WeightPlot({ data, isDaily = false }) {
                 since min and avg weights are less meaningful on a daily basis.
             */}
             {!isDaily && (<Line
-                type="linear"
+                type="monotone"
                 dataKey={"min_weight_lb"}
                 stroke={"#82ca9d"}
                 name={"Minimum Weight"}
                 strokeWidth={2}
-                dot={{ r: 4 }}
+                dot={{ r: 2 }}
             />)}
 
             <Line
-                type="linear"
+                type="monotone"
                 dataKey={"max_weight_lb"}
                 stroke={"#3b82f6"}
                 name={"Maximum Weight"}
                 strokeWidth={2}
-                dot={{ r: 4 }}
+                dot={{ r: 2 }}
             />
         </LineChart>
     );
