@@ -6,7 +6,6 @@ import './HealthMetrics.css';
 import MilesPlot from "./plots/Miles.jsx";
 import WeightPlot from "./plots/Weight.jsx";
 import WorkoutsPlot from "./plots/Workouts.jsx";
-import StepCountPlot from "./plots/StepCount.jsx";
 
 
 import { CACHE_DURATION_MS } from "../Constants.js";
