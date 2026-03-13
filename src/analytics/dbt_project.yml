@@ -18,7 +18,6 @@ data_tests:
 models:
   health_metrics:
     +persist_docs:
-      +persist_docs:
       relation: true
       columns: true
     +submission_method: serverless

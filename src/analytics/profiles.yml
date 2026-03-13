@@ -7,8 +7,27 @@ health_metrics:
       project: ian-is-online
       dataset: dbt
       threads: 4
-      keyfile: /app/service_accounts/ian-is-online-e8d79794493b.json
+      keyfile: ../../service_accounts/ian-is-online-e8d79794493b.json
       location: us
+
+      # NOTE - These resources are managed with Terraform
+      # See: `/infra` directory
+      gcs_bucket: health-metrics-4dd9b4b7
+      compute_region: us-central1
+      
+      # Dataproc Serverless configuration
+      submission_method: dataproc
+
+      dataproc_batch:
+        # Force the smallest possible machine shapes
+        runtime_config:
+          properties:
+            "spark.driver.cores": "4"
+            "spark.driver.memory": "4g"
+            "spark.executor.cores": "4"
+            "spark.executor.memory": "4g"
+            "spark.executor.instances": "2"
+            "spark.dynamicAllocation.enabled": "false"
     
     cloud:
       type: bigquery
@@ -16,4 +35,23 @@ health_metrics:
       project: ian-is-online
       dataset: dbt
       threads: 4
-      location: us
+      location: us-central1
+
+      # NOTE - These resources are managed with Terraform
+      # See: `/infra` directory
+      gcs_bucket: health-metrics-4dd9b4b7
+      dataproc_region: us-central1
+      
+      # Dataproc Serverless configuration
+      submission_method: serverless
+
+      dataproc_batch:
+        # Force the smallest possible machine shapes
+        runtime_config:
+          properties:
+            "spark.driver.cores": "4"
+            "spark.driver.memory": "4g"
+            "spark.executor.cores": "4"
+            "spark.executor.memory": "4g"
+            "spark.executor.instances": "2"
+            "spark.dynamicAllocation.enabled": "false"

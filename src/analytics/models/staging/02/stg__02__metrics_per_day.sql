@@ -29,7 +29,7 @@ WITH
 
         FROM base,
             UNNEST(food_line_items) AS fl
-        JOIN {{ source("gemini_models", "stg__02__food_intake_scored") }} AS scores
+        JOIN {{ source("scored_records", "stg__02__food_intake_scored") }} AS scores
             ON fl.surrogate_line_item_pk = scores.surrogate_line_item_pk
         GROUP BY 1
     ),

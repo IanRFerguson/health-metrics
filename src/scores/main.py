@@ -2,12 +2,14 @@ import logging
 
 import click
 import polars as pl
+from google.cloud.exceptions import NotFound
 from google.genai import types
 
 from common.logger import metrics_logger
 from src.scores.constants import (
     GEMINI_CLIENT,
     GEMINI_MODEL,
+    INPUT_TABLE,
     KLONDIKE_CONNECTOR,
     LINE_ITEMS_TO_SCORE_QUERY,
     OUTPUT_TABLE,
@@ -31,8 +33,11 @@ food_score_schema = types.Schema(
 def cli():
     metrics_logger.info("Starting scoring process...")
 
-    # Read unscored data from BigQuery
-    df = KLONDIKE_CONNECTOR.query(LINE_ITEMS_TO_SCORE_QUERY)
+    try:
+        # Read unscored data from BigQuery
+        df = KLONDIKE_CONNECTOR.query(LINE_ITEMS_TO_SCORE_QUERY)
+    except NotFound:
+        df = KLONDIKE_CONNECTOR.query("SELECT * FROM {table}".format(table=INPUT_TABLE))
 
     if df.is_empty():
         metrics_logger.info("No new line items to score. Exiting.")
