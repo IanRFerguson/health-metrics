@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { ResponsiveContainer } from 'recharts';
+import './HealthMetrics.css';
 
 // We've broken these into individual components for maximum customizability
 import MilesPlot from "./plots/Miles.jsx";
 import WeightPlot from "./plots/Weight.jsx";
 import WorkoutsPlot from "./plots/Workouts.jsx";
-import StepCountPlot from "./plots/StepCount.jsx";
 
 
 import { CACHE_DURATION_MS } from "../Constants.js";
@@ -123,7 +123,6 @@ function HealthMetrics() {
         { key: 'total_miles_run', plot_component: MilesPlot, label: 'Miles Run' },
         { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
         { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts', endpoint: '/api/workout-stats?daily={daily}', formatFn: formatWorkoutsData },
-        { key: 'step_count', plot_component: StepCountPlot, label: 'Step Count' },
     ];
 
     // This is the value that's currently selected from the dropdown
@@ -242,20 +241,14 @@ function HealthMetrics() {
     const PlotComponent = currentMetric.plot_component;
 
     return (
-        <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <label htmlFor="metric-select" style={{ fontWeight: 'bold' }}>Metric:</label>
+        <div className="health-metrics-container">
+            <div className="health-metrics-controls">
+                <label htmlFor="metric-select">Metric:</label>
                 <select
                     id="metric-select"
                     value={selectedMetric}
                     onChange={(e) => setSelectedMetric(e.target.value)}
-                    style={{
-                        padding: '8px 12px',
-                        fontSize: '14px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                        cursor: 'pointer'
-                    }}
+                    className="health-metrics-select"
                 >
                     {metrics.map(metric => (
                         <option key={metric.key} value={metric.key}>
@@ -264,21 +257,18 @@ function HealthMetrics() {
                     ))}
                 </select>
             </div>
-            <ResponsiveContainer width="90%" height={500}>
-                <PlotComponent data={data} isDaily={dailyStats} />
-            </ResponsiveContainer>
-            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <label htmlFor="daily-toggle" style={{ fontWeight: 'bold' }}>Daily Stats:</label>
+            <div className="health-metrics-chart-wrapper">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PlotComponent data={data} isDaily={dailyStats} />
+                </ResponsiveContainer>
+            </div>
+            <div className="health-metrics-toggle">
+                <label htmlFor="daily-toggle">Daily Stats:</label>
                 <input
                     type="checkbox"
                     id="daily-toggle"
                     checked={dailyStats}
                     onChange={(e) => setDailyStats(e.target.checked)}
-                    style={{
-                        width: '18px',
-                        height: '18px',
-                        cursor: 'pointer'
-                    }}
                 />
             </div>
         </div>

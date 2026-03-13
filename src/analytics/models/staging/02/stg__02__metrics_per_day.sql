@@ -11,30 +11,7 @@ WITH
         FROM {{ ref("stg__01__health_metrics") }}
     ),
 
-    food_scores_agg AS (
-        SELECT
-
-            base.target_date,
-            ROUND(SUM(scores.score), 3) AS total_food_score,
-            ROUND(AVG(scores.score), 3) AS average_food_score,
-            MIN(scores.score) AS min_food_score,
-            MAX(scores.score) AS max_food_score,
-            ARRAY_AGG(
-                STRUCT(
-                    fl.food_line_item,
-                    fl.surrogate_line_item_pk,
-                    scores.score AS food_score
-                )
-            ) AS food_line_items
-
-        FROM base,
-            UNNEST(food_line_items) AS fl
-        JOIN {{ source("scored_records", "stg__02__food_intake_scored") }} AS scores
-            ON fl.surrogate_line_item_pk = scores.surrogate_line_item_pk
-        GROUP BY 1
-    ),
-
-    activity_agg AS (
+    staged AS (
         SELECT
             
             target_date,
@@ -45,7 +22,6 @@ WITH
             ROUND(SUM(sum_stand_count), 3) AS total_stand_count,
             ROUND(SUM(sum_flights_climbed), 3) AS total_flights_climbed,
             ROUND(SUM(sum_step_count), 3) AS total_step_count,
-            MAX(weight_lb) AS max_weight_lb,
             
             -- Use ARRAY_CONCAT_AGG only if base has multiple rows per date
             ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts
@@ -73,6 +49,8 @@ WITH
 SELECT
 
     staged.*,
+    wm.max_weight_lb,
+
     -- Extract total_miles_run from the final array in the outer SELECT
     (
         SELECT ROUND(SUM(CAST(dw.distance_in_miles AS FLOAT64)), 3)
@@ -81,3 +59,4 @@ SELECT
     ) AS total_miles_run
 
 FROM staged
+JOIN weight_modeled AS wm USING (target_date)
