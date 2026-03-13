@@ -12,32 +12,84 @@ resource "google_workflows_workflow" "job_orchestrator" {
   source_contents = <<-EOF
     main:
       steps:
+        # 1. Load job
         - run_load_job:
             call: googleapis.run.v2.projects.locations.jobs.run
             args:
               name: ${google_cloud_run_v2_job.load_job.id}
-            result: load_results
+            result: load_op
         
-        - wait_for_load_job:
+        - wait_load_job:
             call: googleapis.run.v2.projects.locations.operations.get
             args:
-              name: $${load_results.name}
-            result: op_a
+              name: $${load_op.name}
+            result: load_status
         
-        - check_load_job_status:
+        - check_load_job:
             switch:
-              - condition: $${op_a.done == true}
-                next: run_transform_job
-            next: wait_for_load_job
+              - condition: $${load_status.done == true}
+                next: run_dbt_pre_gemini
+            next: wait_load_job
         
-        - run_transform_job:
+        # 2. DBT pre-gemini
+        - run_dbt_pre_gemini:
             call: googleapis.run.v2.projects.locations.jobs.run
             args:
-              name: ${google_cloud_run_v2_job.transform_job.id}
-            result: transform_results
+              name: ${google_cloud_run_v2_job.transform_job_pre_gemini.id}
+            result: dbt_pre_op
+        
+        - wait_dbt_pre_gemini:
+            call: googleapis.run.v2.projects.locations.operations.get
+            args:
+              name: $${dbt_pre_op.name}
+            result: dbt_pre_status
+        
+        - check_dbt_pre_gemini:
+            switch:
+              - condition: $${dbt_pre_status.done == true}
+                next: run_gemini_annotations
+            next: wait_dbt_pre_gemini
+        
+        # 3. Gemini annotations
+        - run_gemini_annotations:
+            call: googleapis.run.v2.projects.locations.jobs.run
+            args:
+              name: ${google_cloud_run_v2_job.gemini_annotations.id}
+            result: gemini_op
+        
+        - wait_gemini_annotations:
+            call: googleapis.run.v2.projects.locations.operations.get
+            args:
+              name: $${gemini_op.name}
+            result: gemini_status
+        
+        - check_gemini_annotations:
+            switch:
+              - condition: $${gemini_status.done == true}
+                next: run_dbt_post_gemini
+            next: wait_gemini_annotations
+        
+        # 4. DBT post-gemini
+        - run_dbt_post_gemini:
+            call: googleapis.run.v2.projects.locations.jobs.run
+            args:
+              name: ${google_cloud_run_v2_job.transform_job_post_gemini.id}
+            result: dbt_post_op
+        
+        - wait_dbt_post_gemini:
+            call: googleapis.run.v2.projects.locations.operations.get
+            args:
+              name: $${dbt_post_op.name}
+            result: dbt_post_status
+        
+        - check_dbt_post_gemini:
+            switch:
+              - condition: $${dbt_post_status.done == true}
+                next: finish
+            next: wait_dbt_post_gemini
         
         - finish:
-            return: "Both jobs completed successfully"
+            return: "Pipeline completed successfully"
   EOF
 }
 
