@@ -30,8 +30,17 @@ food_score_schema = types.Schema(
 
 
 @click.command()
-def cli():
+@click.option(
+    "--full-refresh", is_flag=True, help="Whether to perform a full refresh of the data"
+)
+def cli(full_refresh: bool = False):
     metrics_logger.info("Starting scoring process...")
+
+    if full_refresh:
+        metrics_logger.info(
+            "Performing full refresh. Deleting existing data from output table..."
+        )
+        KLONDIKE_CONNECTOR.query(f"DROP TABLE IF EXISTS {OUTPUT_TABLE};")
 
     try:
         # Read unscored data from BigQuery
