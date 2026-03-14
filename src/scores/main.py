@@ -40,7 +40,7 @@ def cli(full_refresh: bool = False):
         metrics_logger.info(
             "Performing full refresh. Deleting existing data from output table..."
         )
-        KLONDIKE_CONNECTOR.query(f"DROP TABLE {OUTPUT_TABLE};")
+        KLONDIKE_CONNECTOR.query(f"DROP TABLE IF EXISTS {OUTPUT_TABLE};")
 
     try:
         # Read unscored data from BigQuery
