@@ -98,3 +98,34 @@ def get_monthly_stats():
     metrics_logger.info(f"Retrieved {len(data)} records from BigQuery")
 
     return jsonify(data)
+
+
+@bp.route("/dow-stats", methods=["GET"])
+def get_dow_stats():
+    """
+    This endpoint hits the analytical dbt models in BigQuery
+    to get day-of-week health metrics for the current year.
+    """
+
+    metrics_logger.info("Fetching day-of-week health metrics from BigQuery")
+
+    query = """
+    SELECT 
+        dow_num,
+        dow_name,
+        days_run,
+        total_miles_run,
+        avg_exercise_minutes,
+        avg_step_count,
+        avg_food_score
+    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_by_dow`
+    """
+    metrics_logger.debug(f"Executing query: {query}")
+
+    query_job = BQ_CLIENT.query(query)
+    results = query_job.result()
+
+    data = [dict(row) for row in results]
+    metrics_logger.info(f"Retrieved {len(data)} records from BigQuery")
+
+    return jsonify(data)
