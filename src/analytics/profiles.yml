@@ -35,7 +35,7 @@ health_metrics:
       project: ian-is-online
       dataset: dbt
       threads: 4
-      location: us-central1
+      location: us
 
       # NOTE - These resources are managed with Terraform
       # See: `/infra` directory
