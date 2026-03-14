@@ -16,8 +16,8 @@ WITH
             DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
             SUM(total_food_score) AS total_food_score,
             SUM(total_food_score) / COUNT(DISTINCT target_date) AS avg_food_score,
-            MIN(min_food_score) AS min_food_score,
-            MAX(max_food_score) AS max_food_score
+            AVG(min_food_score) AS avg_min_food_score,
+            AVG(max_food_score) AS avg_max_food_score
         
         FROM {{ ref("stg__02__metrics_per_day") }}
         GROUP BY 1
@@ -64,6 +64,9 @@ WITH
             MAX(weight_lb) AS max_weight_lb,
             
             SUM(total_food_score) / COUNT(*) AS food_score,
+            MIN(avg_min_food_score) AS avg_min_food_score,
+            MAX(avg_max_food_score) AS avg_max_food_score,
+
 
             COUNT(*) AS days_recorded
         
