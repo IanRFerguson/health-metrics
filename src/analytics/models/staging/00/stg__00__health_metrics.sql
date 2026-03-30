@@ -56,9 +56,8 @@ WITH
             DATE(base.date_time) AS measurement_date,
             base.* EXCEPT(weight),
             LAST_VALUE(base.`weight` IGNORE NULLS) OVER (
-                PARTITION BY DATE(base.date_time)
                 ORDER BY base.date_time
-                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) AS `weight`,
             {{
                 dbt_utils.generate_surrogate_key(
