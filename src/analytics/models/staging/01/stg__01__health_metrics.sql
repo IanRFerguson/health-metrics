@@ -17,7 +17,10 @@ WITH
                 )
             ) AS food_line_items
 
-        FROM {{ ref("stg__00__food_journal") }}
+        FROM (
+            SELECT DISTINCT load_date, time_of_day, food_line_item
+            FROM {{ ref("stg__00__food_journal") }}
+        )
         GROUP BY ALL
     ),
 

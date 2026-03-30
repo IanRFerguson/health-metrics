@@ -47,7 +47,7 @@ WITH
         FROM base
         GROUP BY ALL
         QUALIFY ROW_NUMBER() OVER (
-            PARTITION BY workout_start, workout_type
+            PARTITION BY DATE(workout_start), workout_type, workout_duration
             ORDER BY _load_timestamp DESC
         ) = 1
     )
