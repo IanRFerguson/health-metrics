@@ -15,7 +15,7 @@ select
   total_step_count,
   max_weight_lb,
   all_daily_workouts,
-  all_food_line_items
+  scored_food_line_items
 from dbt_health_metrics_analytics.metrics_per_day
 where target_date between (select start_date from date_bookends) and (select end_date from date_bookends)
 order by target_date

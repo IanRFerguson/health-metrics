@@ -19,7 +19,7 @@ else:
     KLONDIKE_CONNECTOR = BigQueryConnector(bypass_env_variable=True)
 
 GEMINI_CLIENT = genai.Client()
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-2.5-pro"
 
 INPUT_TABLE = "dbt_health_metrics_staging.stg__01__food_intake"
 OUTPUT_TABLE = "dbt_health_metrics_staging.stg__02__food_intake_scored"

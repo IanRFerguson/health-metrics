@@ -18,7 +18,7 @@ else:
     KLONDIKE_CONNECTOR = BigQueryConnector(bypass_env_variable=True)
 
 GEMINI_CLIENT = genai.Client()
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-2.5-pro"
 STORAGE_CLIENT = storage.Client()
 
 PROMPT = """
