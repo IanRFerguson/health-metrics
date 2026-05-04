@@ -37,6 +37,7 @@ WITH
                     pace_seconds,
                     {{ format_pace_string("pace_seconds") }} AS pace,
                     workout_duration,
+                    TIME_DIFF(CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE) AS duration_minutes,
                     total_energy,
                     active_energy,
                     max_heart_rate,

@@ -24,6 +24,11 @@ const tooltipSeries = [
     }
 ];
 
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+
+const formatMonth = (month) => MONTH_NAMES[month - 1] ?? month;
+
 // Helper function to format minutes back to HH:MM for display
 const formatMinutesToTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
@@ -34,7 +39,7 @@ const formatMinutesToTime = (minutes) => {
     return `${mins}`;
 };
 
-export default function WorkoutsPlot({ data, isDaily = false }) {
+function DailyWorkoutsPlot({ data }) {
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey="target_date" />
@@ -43,10 +48,7 @@ export default function WorkoutsPlot({ data, isDaily = false }) {
                 tickFormatter={formatMinutesToTime}
                 label={{ value: 'Duration (min)', angle: -90, position: 'insideLeft' }}
             />
-            <Tooltip
-                content={<CustomTooltip isDaily={isDaily} series={tooltipSeries} />}
-                cursor={{ fill: 'transparent' }}
-            />
+            <Tooltip content={<CustomTooltip isDaily={true} series={tooltipSeries} />} cursor={{ fill: 'transparent' }} />
             <Bar dataKey="workout_duration_minutes">
                 {data.map((entry, index) => (
                     <Cell
@@ -57,4 +59,30 @@ export default function WorkoutsPlot({ data, isDaily = false }) {
             </Bar>
         </BarChart>
     );
+}
+
+function AggregatedWorkoutsPlot({ data }) {
+    return (
+        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <XAxis dataKey="month" tickFormatter={formatMonth} />
+            <YAxis
+                domain={['auto', 'auto']}
+                tickFormatter={formatMinutesToTime}
+                label={{ value: 'Total Workouts', angle: -90, position: 'insideLeft' }}
+            />
+            <Tooltip content={<CustomTooltip isDaily={false} series={tooltipSeries} />} cursor={{ fill: 'transparent' }} />
+            <Bar dataKey="workout_count">
+                {data.map((entry, index) => (
+                    <Cell
+                        key={`cell-${index}`}
+                        fill={entry.workout_type === 'RUN' ? "rgba(34, 197, 94, 0.8)" : "rgba(59, 130, 246, 0.8)"}
+                    />
+                ))}
+            </Bar>
+        </BarChart>
+    );
+}
+
+export default function WorkoutsPlot({ data, isDaily = false }) {
+    return isDaily ? <DailyWorkoutsPlot data={data} /> : <AggregatedWorkoutsPlot data={data} />;
 }

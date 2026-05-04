@@ -75,16 +75,23 @@ def get_workout_stats():
 
     metrics_logger.info("Fetching workout stats from BigQuery")
 
-    if not request.args.get("daily") == "true":
-        metrics_logger.warning("No weekly enpoint exists, defaulting to daily stats")
-
-    query = """
-        SELECT 
-            *
-        FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
-        WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
-        ORDER BY target_date ASC
-        """
+    # Run against daily or aggregated table based on query parameter
+    if request.args.get("daily") == "true":
+        query = """
+            SELECT 
+                *
+            FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
+            WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
+            ORDER BY target_date ASC
+            """
+    else:
+        query = """
+            SELECT 
+                *
+            FROM `ian-is-online.dbt_health_metrics_analytics.workouts_aggregated`
+            WHERE year = EXTRACT(YEAR FROM CURRENT_DATE())
+            ORDER BY year, month, workout_type
+            """
 
     metrics_logger.debug(f"Executing query: {query}")
 
