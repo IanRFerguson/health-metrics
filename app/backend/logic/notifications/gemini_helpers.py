@@ -99,6 +99,10 @@ def get_gemini_summaries() -> dict:
         resp = KLONDIKE_CONNECTOR.query(query)
         past_week_data = resp.to_dicts()
 
+        # Adding an extra log to help debug the scheduler
+        first_day = past_week_data[0]["target_date"].strftime("%Y-%m-%d")
+        metrics_logger.info(f"First day of the past week data: {first_day}")
+
     with open(
         os.path.join(os.path.dirname(__file__), "query__this_year.sql")
     ) as _query:
