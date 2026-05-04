@@ -1,7 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import CustomTooltip from './CustomTooltip';
 
-const tooltipSeries = [
+const dailyTooltipSeries = [
     {
         dataKey: "workout_type",
         label: "Workout Type",
@@ -20,6 +20,24 @@ const tooltipSeries = [
     {
         dataKey: "active_energy",
         label: "Active Energy",
+        color: "#3b82f6"
+    }
+];
+
+const aggregatedTooltipSeries = [
+    {
+        dataKey: "workout_count",
+        label: "Workout Count",
+        color: "#3b82f6"
+    },
+    {
+        dataKey: "average_workout_duration_minutes",
+        label: "Average Workout Duration",
+        color: "#3b82f6"
+    },
+    {
+        dataKey: "average_pace",
+        label: "Average Pace",
         color: "#3b82f6"
     }
 ];
@@ -48,7 +66,7 @@ function DailyWorkoutsPlot({ data }) {
                 tickFormatter={formatMinutesToTime}
                 label={{ value: 'Duration (min)', angle: -90, position: 'insideLeft' }}
             />
-            <Tooltip content={<CustomTooltip isDaily={true} series={tooltipSeries} />} cursor={{ fill: 'transparent' }} />
+            <Tooltip content={<CustomTooltip isDaily={true} series={dailyTooltipSeries} />} cursor={{ fill: 'transparent' }} />
             <Bar dataKey="workout_duration_minutes">
                 {data.map((entry, index) => (
                     <Cell
@@ -62,17 +80,23 @@ function DailyWorkoutsPlot({ data }) {
 }
 
 function AggregatedWorkoutsPlot({ data }) {
+    // Give each bar a unique x-axis key to avoid Recharts matching the wrong bar
+    // when multiple bars share the same month value.
+    const chartData = data.map(d => ({ ...d, _barKey: `${d.month}_${d.workout_type}` }));
+    const formatBarKeyTick = (key) => formatMonth(parseInt(key.split('_')[0]));
+    const formatBarKeyLabel = (key) => formatMonth(parseInt(key.split('_')[0]));
+
     return (
-        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <XAxis dataKey="month" tickFormatter={formatMonth} />
+        <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <XAxis dataKey="_barKey" tickFormatter={formatBarKeyTick} />
             <YAxis
                 domain={['auto', 'auto']}
                 tickFormatter={formatMinutesToTime}
                 label={{ value: 'Total Workouts', angle: -90, position: 'insideLeft' }}
             />
-            <Tooltip content={<CustomTooltip isDaily={false} series={tooltipSeries} />} cursor={{ fill: 'transparent' }} />
+            <Tooltip content={<CustomTooltip isDaily={false} series={aggregatedTooltipSeries} labelFormatter={formatBarKeyLabel} />} cursor={{ fill: 'transparent' }} />
             <Bar dataKey="workout_count">
-                {data.map((entry, index) => (
+                {chartData.map((entry, index) => (
                     <Cell
                         key={`cell-${index}`}
                         fill={entry.workout_type === 'RUN' ? "rgba(34, 197, 94, 0.8)" : "rgba(59, 130, 246, 0.8)"}
