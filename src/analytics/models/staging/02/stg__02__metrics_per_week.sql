@@ -23,6 +23,21 @@ WITH
         GROUP BY 1
     ),
 
+    sleep_scores AS (
+        SELECT
+        
+            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+            ROUND(AVG(sm.sleep__total_hr), 3) AS avg_sleep_total_hr,
+            ROUND(AVG(sm.sleep__awake_hr), 3) AS avg_sleep_awake_hr,
+            ROUND(AVG(sm.sleep__core_hr), 3) AS avg_sleep_core_hr,
+            ROUND(AVG(sm.sleep__deep_hr), 3) AS avg_sleep_deep_hr,
+            ROUND(AVG(sm.sleep__rem_hr), 3) AS avg_sleep_rem_hr
+        
+        FROM {{ ref("stg__02__metrics_per_day") }},
+            UNNEST(all_sleep_metrics) AS sm
+        GROUP BY 1
+    ),
+
     workout_metrics AS (
         SELECT
 
@@ -59,14 +74,15 @@ WITH
             ROUND(SUM(sum_flights_climbed), 3) AS total_flights_climbed,
             ROUND(SUM(sum_step_count), 3) AS total_step_count,
             
+            -- Weight
             MIN(weight_lb) AS min_weight_lb,
             ROUND(AVG(weight_lb), 3) AS avg_weight_lb,
             MAX(weight_lb) AS max_weight_lb,
             
+            -- Food scores
             SUM(total_food_score) / COUNT(*) AS food_score,
             MIN(avg_min_food_score) AS avg_min_food_score,
             MAX(avg_max_food_score) AS avg_max_food_score,
-
 
             COUNT(*) AS days_recorded
         
@@ -95,6 +111,12 @@ SELECT
     workout_metrics.total_miles_run,
     workout_metrics.total_miles_run >= 10.0 AS running_goal_met,
     workout_metrics.pace AS avg_pace,
+
+    sleep_scores.avg_sleep_total_hr,
+    sleep_scores.avg_sleep_awake_hr,
+    sleep_scores.avg_sleep_core_hr,
+    sleep_scores.avg_sleep_deep_hr,
+    sleep_scores.avg_sleep_rem_hr,
     
     CURRENT_TIMESTAMP() AS _dbt_last_run_at,
     DATE_TRUNC(CURRENT_DATE(), WEEK(MONDAY)) = staged.start_date AS _is_current_week
@@ -102,3 +124,4 @@ SELECT
 
 FROM staged
 LEFT JOIN workout_metrics USING(start_date)
+LEFT JOIN sleep_scores USING(start_date)

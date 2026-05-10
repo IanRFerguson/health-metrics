@@ -13,6 +13,13 @@ models:
           column_name: surrogate_pk
       - not_null:
           column_name: surrogate_pk
+
+  - name: stg__00__sleep
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk
   
   - name: stg__00__workouts
     tests:

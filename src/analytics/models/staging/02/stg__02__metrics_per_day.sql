@@ -84,7 +84,8 @@ WITH
             ROUND(SUM(sum_step_count), 3) AS total_step_count,
             
             -- Use ARRAY_CONCAT_AGG only if base has multiple rows per date
-            ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts
+            ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts,
+            ARRAY_CONCAT_AGG(sleep_metrics) AS all_sleep_metrics
         
         FROM base
         GROUP BY 1
