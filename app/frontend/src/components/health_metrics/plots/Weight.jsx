@@ -34,16 +34,16 @@ export default function WeightPlot({ data, isDaily = false }) {
                 stroke={"#82ca9d"}
                 name={"Minimum Weight"}
                 strokeWidth={2}
-                dot={{ r: 2 }}
+                dot={{ r: 1 }}
             />)}
 
             <Line
-                type="monotone"
+                type="linear"
                 dataKey={"max_weight_lb"}
                 stroke={"#3b82f6"}
                 name={"Maximum Weight"}
                 strokeWidth={2}
-                dot={{ r: 2 }}
+                dot={{ r: 1 }}
             />
         </LineChart>
     );

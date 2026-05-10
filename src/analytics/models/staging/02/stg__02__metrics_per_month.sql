@@ -25,11 +25,7 @@ WITH
             EXTRACT(YEAR FROM start_date) AS year,
             EXTRACT(MONTH FROM start_date) AS month,
             
-            -- Workout stats
-            SUM(high_impact_workouts) AS high_impact_workouts,
-            SUM(strength_workouts) AS strength_workouts,
-            SUM(running_workouts) AS running_workouts,
-            ROUND(SUM(total_miles_run), 3) AS total_miles_run,
+            -- High-level workout status
             SUM(running_workouts) / NULLIF(COUNT(DISTINCT start_date), 0) AS avg_running_workouts_per_week,
             COUNTIF(running_goal_met) AS weeks_running_goal_met,
             COUNTIF(running_goal_met) / NULLIF(COUNT(DISTINCT start_date), 0) AS pct_weeks_running_goal_met
@@ -38,11 +34,47 @@ WITH
         GROUP BY 1,2
     ),
 
+    workout_stats AS (
+        SELECT 
+            EXTRACT(YEAR FROM workout_date) AS year,
+            EXTRACT(MONTH FROM workout_date) AS month,
+            COUNT(*) AS total_workouts,
+            COUNTIF(UPPER(workout_type) LIKE '%RUN%') AS running_workouts,
+            COUNTIF(UPPER(workout_type) LIKE '%STRENGTH%') AS strength_workouts,
+            COUNTIF(high_impact) AS high_impact_workouts,
+            ROUND(SUM(
+                CASE 
+                    WHEN UPPER(workout_type) LIKE '%RUN%' THEN distance_in_miles 
+                    ELSE 0 
+                END
+            ), 3) AS total_miles_run
+        FROM {{ ref("stg__00__workouts") }}
+        GROUP BY 1,2
+    ),
+
+    sleep_stats AS (
+        SELECT 
+            
+            EXTRACT(YEAR FROM target_date) AS year,
+            EXTRACT(MONTH FROM target_date) AS month,
+            ROUND(AVG(sm.sleep__total_hr), 3) AS avg_sleep_total_hr,
+            ROUND(AVG(sm.sleep__awake_hr), 3) AS avg_sleep_awake_hr,
+            ROUND(AVG(sm.sleep__core_hr), 3) AS avg_sleep_core_hr,
+            ROUND(AVG(sm.sleep__deep_hr), 3) AS avg_sleep_deep_hr,
+            ROUND(AVG(sm.sleep__rem_hr), 3) AS avg_sleep_rem_hr
+
+        FROM {{ ref("stg__02__metrics_per_day") }} AS mpd,
+            UNNEST(mpd.all_sleep_metrics) AS sm
+        GROUP BY 1,2
+    ),
+
     joined AS (
         SELECT 
             *
         FROM weekly_stats
-        JOIN daily_stats USING (year, month)
+        LEFT JOIN daily_stats USING (year, month)
+        LEFT JOIN workout_stats USING (year, month)
+        LEFT JOIN sleep_stats USING (year, month)
         ORDER BY year, month
     )
 

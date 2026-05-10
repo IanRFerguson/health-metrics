@@ -155,6 +155,8 @@ function HealthMetrics() {
                     currentMetric.endpoint.replace('{daily}', dailyStats ? 'true' : 'false') :
                     (dailyStats ? '/api/daily-stats' : '/api/weekly-stats');
 
+                console.log(`Determined endpoint for ${currentMetric.label}: ${endpoint}`);
+
                 const cacheKey = currentMetric.endpoint ? `stats_${selectedMetric}_${dailyStats ? 'daily' : 'weekly'}` : `stats_${dailyStats ? 'daily' : 'weekly'}`;
 
                 // Check cache first

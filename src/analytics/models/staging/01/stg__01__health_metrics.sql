@@ -37,6 +37,7 @@ WITH
                     pace_seconds,
                     {{ format_pace_string("pace_seconds") }} AS pace,
                     workout_duration,
+                    TIME_DIFF(CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE) AS duration_minutes,
                     total_energy,
                     active_energy,
                     max_heart_rate,
@@ -47,6 +48,27 @@ WITH
 
         FROM {{ ref("stg__00__workouts") }}
         GROUP BY 1,2
+    ),
+
+    sleep_metrics AS (
+        SELECT
+            measurement_date,
+            '00-MORNING' AS time_of_day, -- Sleep metrics are only recorded in the morning, so we can hardcode this value
+            ARRAY_AGG(
+                STRUCT(
+                    sleep__asleep_hr,
+                    sleep__awake_hr,
+                    sleep__core_hr,
+                    sleep__deep_hr,
+                    sleep__in_bed_hr,
+                    sleep__rem_hr,
+                    sleep__total_hr,
+                    surrogate_pk AS sleep_metrics_pk
+                )
+            ) AS sleep_metrics
+        FROM {{ ref("stg__00__sleep") }}
+        WHERE sleep__is_valid -- This filters out naps
+        GROUP BY 1
     ),
 
     health_metrics AS (
@@ -83,11 +105,12 @@ SELECT
     CAST(health_metrics.weight_lb AS FLOAT64) AS weight_lb,
     workouts.daily_workouts,
     food_intake.food_line_items,
+    sleep_metrics.sleep_metrics,
     {{
         dbt_utils.generate_surrogate_key(
             [
-                "target_date",
-                "time_of_day"
+                "health_metrics.target_date",
+                "health_metrics.time_of_day"
             ]
         )
     }} AS surrogate_pk
@@ -95,3 +118,6 @@ SELECT
 FROM health_metrics
 LEFT JOIN workouts USING(target_date, time_of_day)
 LEFT JOIN food_intake USING(target_date, time_of_day)
+LEFT JOIN sleep_metrics 
+    ON health_metrics.target_date = sleep_metrics.measurement_date
+    AND health_metrics.time_of_day = sleep_metrics.time_of_day 

@@ -1,6 +1,9 @@
-const CustomTooltip = ({ active, payload, label, isDaily = false, series = [] }) => {
+const CustomTooltip = ({ active, payload, label, isDaily = false, series = [], labelOverride = null, labelFormatter = null }) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
+
+        const formattedLabel = labelFormatter ? labelFormatter(label) : (isDaily ? `${label}` : `Week of ${label}`);
+        const displayLabel = labelOverride !== null ? labelOverride : formattedLabel;
 
         return (
             <div style={{
@@ -10,7 +13,7 @@ const CustomTooltip = ({ active, payload, label, isDaily = false, series = [] })
                 borderRadius: '4px',
                 color: '#fff'
             }}>
-                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>{isDaily ? `${label}` : `Week of ${label}`}</p>
+                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>{displayLabel}</p>
                 {series.map(s => {
                     // Use the accessor if provided, otherwise, fall back to dataKey
                     const value = s.accessor ? s.accessor(data) : data[s.dataKey];
