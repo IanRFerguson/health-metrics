@@ -94,6 +94,8 @@ resource "google_workflows_workflow" "job_orchestrator" {
 }
 
 resource "google_cloud_scheduler_job" "workflow_trigger" {
+  count = var.enable_cron_trigger ? 1 : 0
+
   name             = "pipeline-workflow-trigger"
   description      = "Triggers the ML orchestration workflow"
   schedule         = local.cron_schedule

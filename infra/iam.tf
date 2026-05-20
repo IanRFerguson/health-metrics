@@ -17,6 +17,7 @@ locals {
     "monitoring.notificationChannelEditor",
     "monitoring.alertPolicyEditor",
     "workflows.invoker",
+    "eventarc.eventReceiver",
   ]
 }
 
