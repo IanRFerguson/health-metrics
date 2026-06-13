@@ -78,7 +78,9 @@ function AggregatedWorkoutsPlot({ data }) {
     // Pivot rows into one entry per month with separate run/strength counts
     const byMonth = {};
     for (const row of data) {
-        if (!byMonth[row.month]) byMonth[row.month] = { month: row.month };
+        if (!byMonth[row.month]) {
+            byMonth[row.month] = { month: row.month, run_count: 0, strength_count: 0 };
+        }
         if (row.workout_type === 'RUN') {
             byMonth[row.month].run_count = row.workout_count;
         } else {
