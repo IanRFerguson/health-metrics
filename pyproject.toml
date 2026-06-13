@@ -17,6 +17,7 @@ dependencies = [
     "pandas",
     "resend>=2.22.0",
     "google-genai>=1.65.0",
+    "dbt-bigquery>=1.11.1",
 ]
 
 [dependency-groups]
