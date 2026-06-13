@@ -24,8 +24,12 @@ logging.getLogger("klondike").setLevel(logging.WARNING)
 
 food_score_schema = types.Schema(
     type="OBJECT",
-    properties={"score": types.Schema(type="NUMBER")},
-    required=["score"],
+    properties={
+        "score": types.Schema(type="NUMBER"),
+        "estimated_calories": types.Schema(type="NUMBER"),
+        "estimated_protein": types.Schema(type="NUMBER"),
+    },
+    required=["score", "estimated_calories", "estimated_protein"],
 )
 
 
@@ -54,8 +58,11 @@ def cli(full_refresh: bool = False):
 
     # Process each row with Gemini
     scores = []
-    for _, row in enumerate(df.iter_rows()):
-        metrics_logger.debug(row)
+    for index, row in enumerate(df.iter_rows()):
+        if index % 10 == 0:
+            metrics_logger.info("Processing row %d/%d...", index + 1, df.height)
+
+        metrics_logger.debug("Raw input: %s", row)
 
         # Get the score from Gemini
         response = GEMINI_CLIENT.models.generate_content(
@@ -71,14 +78,28 @@ def cli(full_refresh: bool = False):
         )
 
         # Extract the score from the response
-        score = response.parsed.get("score", 0.0)
-        metrics_logger.info(f"Scored {row[1].strip().upper()} with score: {score}")
+        output = {
+            "score": response.parsed.get("score", 0.0),
+            "estimated_calories": response.parsed.get("estimated_calories", 0.0),
+            "estimated_protein": response.parsed.get("estimated_protein", 0.0),
+        }
+        metrics_logger.info(
+            "Scored %s with score: %s", row[1].strip().upper(), output["score"]
+        )
 
         # Update the DataFrame with the new score
-        scores.append(score)
+        metrics_logger.debug("Parsed output: %s", output)
+        scores.append(output)
 
-    # Add the scores to the DataFrame and cast to float
-    df = df.with_columns(pl.Series(name="score", values=scores, dtype=pl.Float64))
+    # Add the scores to the DataFrame
+    scores_df = pl.DataFrame(scores).cast(
+        {
+            "score": pl.Float64,
+            "estimated_calories": pl.Float64,
+            "estimated_protein": pl.Float64,
+        }
+    )
+    df = df.hstack(scores_df)
 
     # Write the processed data back to BigQuery
     metrics_logger.info(f"Writing scored data back to {OUTPUT_TABLE}...")
