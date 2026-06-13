@@ -104,6 +104,11 @@ SELECT
 
     -- Extract total_miles_run from the final array in the outer SELECT
     (
+        SELECT LOGICAL_OR(dw.high_impact)
+        FROM UNNEST(all_daily_workouts) AS dw
+    ) AS has_high_impact_workout,
+
+    (
         SELECT ROUND(SUM(CAST(dw.distance_in_miles AS FLOAT64)), 3)
         FROM UNNEST(all_daily_workouts) AS dw
         WHERE dw.workout_type LIKE '%RUN%'
