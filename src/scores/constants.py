@@ -21,11 +21,15 @@ else:
 GEMINI_CLIENT = genai.Client()
 GEMINI_MODEL = "gemini-2.5-pro"
 
-INPUT_TABLE = "dbt_health_metrics_staging.stg__01__food_intake"
-OUTPUT_TABLE = "dbt_health_metrics_staging.stg__02__food_intake_scored"
+SCHEMA = {
+    "production": "dbt_health_metrics_staging",
+    "dev": "dbt_dev_health_metrics_staging",
+}
+INPUT_TABLE = f"{SCHEMA[os.environ.get('STAGE', 'dev')]}.stg__01__food_intake"
+OUTPUT_TABLE = f"{SCHEMA[os.environ.get('STAGE', 'dev')]}.stg__02__food_intake_scored"
 
 PROMPT = """
-Score the overall healthiness of the following food intake on a scale of 1.0 to 10.0, where 1.0 is 
+Score the overall, general healthiness of the following food intake on a scale of 1.0 to 10.0, where 1.0 is 
 very unhealthy and 10.0 is very healthy. 
 
 Consider factors such as nutritional value and contribution to my weight loss goals.
@@ -34,7 +38,7 @@ Some reminders:
 * Quest protein bars have 20g sugar and 1g of sugar (these are the only protein bars I eat, unless the brand is otherwise specified)
 * Fairlife chocolate milk 12g sugar and 13g of protein
 * Fairlife protein shakes have 42g protein and 7g of sugar
-* I only use olive oil (no butter or other oils)
+* I only use olive oil and avocado oil when cooking (no butter or other oils)
 * I am trying to lose weight and build muscle, so I want to prioritize high protein and low sugar foods.
 """
 

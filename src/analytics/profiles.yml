@@ -5,7 +5,7 @@ health_metrics:
       type: bigquery
       method: service-account
       project: ian-is-online
-      dataset: dbt
+      dataset: dbt_dev
       threads: 4
       keyfile: ../../service_accounts/ian-is-online-e8d79794493b.json
       location: us

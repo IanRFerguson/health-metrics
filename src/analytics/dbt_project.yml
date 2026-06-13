@@ -11,10 +11,6 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# Set all tests to warn instead of fail
-data_tests:
-  +severity: warn  
-
 models:
   health_metrics:
     +persist_docs:
@@ -22,6 +18,8 @@ models:
       columns: true
     +submission_method: serverless
     +materialized: table
+    # Dev tables have a two day lifecycle rule
+    +hours_to_expiration: "{{ 48 if target.name == 'dev' else none }}"
 
     # Layer-specific overrides
     base:
@@ -40,4 +38,8 @@ models:
     analytics:
       +schema: health_metrics_analytics
       +tags: ["analytics"]
+
+    marts:
+      +schema: health_metrics_marts
+      +tags: ["marts"]
   

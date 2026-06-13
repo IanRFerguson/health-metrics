@@ -10,3 +10,4 @@ data_dev/
 infra/out
 build/
 **.egg-info
+.claude/settings.local.json

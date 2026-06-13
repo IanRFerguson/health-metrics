@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, Cell } from 'recharts';
 import CustomTooltip from './CustomTooltip';
 
 const dailyTooltipSeries = [
@@ -26,19 +26,14 @@ const dailyTooltipSeries = [
 
 const aggregatedTooltipSeries = [
     {
-        dataKey: "workout_count",
-        label: "Workout Count",
-        color: "#3b82f6"
+        dataKey: "run_count",
+        label: "Running",
+        color: "rgba(34, 197, 94, 0.8)"
     },
     {
-        dataKey: "average_workout_duration_minutes",
-        label: "Average Workout Duration",
-        color: "#3b82f6"
-    },
-    {
-        dataKey: "average_pace",
-        label: "Average Pace",
-        color: "#3b82f6"
+        dataKey: "strength_count",
+        label: "Strength",
+        color: "rgba(59, 130, 246, 0.8)"
     }
 ];
 
@@ -80,29 +75,31 @@ function DailyWorkoutsPlot({ data }) {
 }
 
 function AggregatedWorkoutsPlot({ data }) {
-    // Give each bar a unique x-axis key to avoid Recharts matching the wrong bar
-    // when multiple bars share the same month value.
-    const chartData = data.map(d => ({ ...d, _barKey: `${d.month}_${d.workout_type}` }));
-    const formatBarKeyTick = (key) => formatMonth(parseInt(key.split('_')[0]));
-    const formatBarKeyLabel = (key) => formatMonth(parseInt(key.split('_')[0]));
+    // Pivot rows into one entry per month with separate run/strength counts
+    const byMonth = {};
+    for (const row of data) {
+        if (!byMonth[row.month]) {
+            byMonth[row.month] = { month: row.month, run_count: 0, strength_count: 0 };
+        }
+        if (row.workout_type === 'RUN') {
+            byMonth[row.month].run_count = row.workout_count;
+        } else {
+            byMonth[row.month].strength_count = row.workout_count;
+        }
+    }
+    const chartData = Object.values(byMonth).sort((a, b) => a.month - b.month);
 
     return (
         <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <XAxis dataKey="_barKey" tickFormatter={formatBarKeyTick} />
+            <XAxis dataKey="month" tickFormatter={formatMonth} />
             <YAxis
-                domain={['auto', 'auto']}
-                tickFormatter={formatMinutesToTime}
+                domain={[0, 'auto']}
                 label={{ value: 'Total Workouts', angle: -90, position: 'insideLeft' }}
             />
-            <Tooltip content={<CustomTooltip isDaily={false} series={aggregatedTooltipSeries} labelFormatter={formatBarKeyLabel} />} cursor={{ fill: 'transparent' }} />
-            <Bar dataKey="workout_count">
-                {chartData.map((entry, index) => (
-                    <Cell
-                        key={`cell-${index}`}
-                        fill={entry.workout_type === 'RUN' ? "rgba(34, 197, 94, 0.8)" : "rgba(59, 130, 246, 0.8)"}
-                    />
-                ))}
-            </Bar>
+            <Tooltip content={<CustomTooltip isDaily={false} series={aggregatedTooltipSeries} labelFormatter={formatMonth} />} cursor={{ fill: 'transparent' }} />
+            <Legend />
+            <Bar dataKey="run_count" name="Running" fill="rgba(34, 197, 94, 0.8)" />
+            <Bar dataKey="strength_count" name="Strength" fill="rgba(59, 130, 246, 0.8)" />
         </BarChart>
     );
 }
