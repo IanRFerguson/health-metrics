@@ -31,6 +31,8 @@ services:
       dockerfile: ./devops/docker/Dockerfile.pipe
     env_file:
       - .local/elt.env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS="./service_accounts/ian-is-online-e8d79794493b.json"
     volumes:
       - ./service_accounts:/app/service_accounts:ro
       - ./devops:/app/devops:ro
@@ -41,6 +43,8 @@ services:
       dockerfile: ./devops/docker/Dockerfile.pipe
     env_file:
       - .local/elt.env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS="./service_accounts/ian-is-online-e8d79794493b.json"
     volumes:
       - ./service_accounts:/app/service_accounts:ro
       - ./devops:/app/devops:ro
@@ -51,6 +55,8 @@ services:
       dockerfile: ./devops/docker/Dockerfile.pipe
     env_file:
       - .local/elt.env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS="./service_accounts/ian-is-online-e8d79794493b.json"
     volumes:
       - ./service_accounts:/app/service_accounts:ro
       - ./src/analytics:/app/src/analytics
