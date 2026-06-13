@@ -39,25 +39,22 @@ WITH
             -- Food score is >= 75th percentile for rolling 14-day window
             COALESCE(
                 avg_food_score >= (
-                SELECT PERCENTILE_CONT(score, 0.75) OVER ()
+                SELECT APPROX_QUANTILES(score, 100)[OFFSET(75)]
                 FROM UNNEST(rolling_food_scores) AS score
-                LIMIT 1
             ), FALSE) AS threshold__food_score,
             
              -- Calories is <= 75th percentile for rolling 14-day window
             COALESCE(
                 total_estimated_calories <= (
-                SELECT PERCENTILE_CONT(calories, 0.75) OVER ()
+                SELECT APPROX_QUANTILES(calories, 100)[OFFSET(75)]
                 FROM UNNEST(rolling_estimated_calories) AS calories
-                LIMIT 1
             ), FALSE) AS threshold__estimated_calories,
 
              -- Protein is >= median for rolling 14-day window
             COALESCE(
                 total_estimated_protein >= (
-                SELECT PERCENTILE_CONT(protein, 0.50) OVER ()
+                SELECT APPROX_QUANTILES(protein, 100)[OFFSET(50)]
                 FROM UNNEST(rolling_estimated_protein) AS protein
-                LIMIT 1
             ), FALSE) AS threshold__estimated_protein
 
         FROM rolling
