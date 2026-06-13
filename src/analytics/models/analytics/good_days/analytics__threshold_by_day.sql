@@ -48,7 +48,7 @@ SELECT
                 "threshold__high_impact_workout",
                 "threshold__food_score"
             ],
-            cutoff_percentile=0.80
+            cutoff_percentile=0.7
         )
     }}
 FROM thresholds

@@ -1,4 +1,4 @@
-{% macro calculate_good_day_threshold(fields, cutoff_percentile=0.80, column_name="is_good_day") %}
+{% macro calculate_good_day_threshold(fields, cutoff_percentile=0.60, column_name="is_good_day") %}
     {%- set total_thresholds_met = [] -%}
     {%- set total_fields = fields | length -%}
     
