@@ -72,7 +72,7 @@ function weeklyMilesPlot(data, isDaily) {
     return (
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey="start_date" />
-            <YAxis domain={[0, 15]} />
+            <YAxis domain={[0, 20]} />
             <Tooltip
                 content={<CustomTooltip isDaily={isDaily} series={weeklyTooltipSeries} />}
                 cursor={{ fill: 'transparent' }}
