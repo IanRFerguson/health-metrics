@@ -3,8 +3,8 @@ set -e
 
 HOME_DIR="/app"
 
-PIPELINE_CMD="uv run $HOME_DIR/src/health_data/main.py"
-SCORES_CMD="uv run $HOME_DIR/src/scores/main.py"
+PIPELINE_CMD="uv run $HOME_DIR/src/health_data/run_health_data.py"
+SCORES_CMD="uv run $HOME_DIR/src/scores/run_gemini_health_scores.py"
 DBT_CMD_PRE="uv run dbt build -s +tag:pre_gemini"
 DBT_CMD_POST="uv run dbt build -s tag:post_gemini+"
 
