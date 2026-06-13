@@ -40,4 +40,8 @@ models:
     analytics:
       +schema: health_metrics_analytics
       +tags: ["analytics"]
+
+    marts:
+      +schema: health_metrics_marts
+      +tags: ["marts"]
   
