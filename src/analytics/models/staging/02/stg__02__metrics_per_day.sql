@@ -33,7 +33,9 @@ WITH
         SELECT
 
             surrogate_line_item_pk,
-            score
+            score,
+            estimated_calories,
+            estimated_protein
 
         FROM {{ source("scored_records", "stg__02__food_intake_scored") }}
     ),
@@ -46,7 +48,9 @@ WITH
                 STRUCT(
                     fli.surrogate_line_item_pk,
                     fli.food_line_item,
-                    fr.score
+                    fr.score,
+                    fr.estimated_calories,
+                    fr.estimated_protein
                 )
             ) AS scored_food_line_items
 
@@ -64,7 +68,9 @@ WITH
             MIN(score) AS min_food_score,
             AVG(score) AS avg_food_score,
             MAX(score) AS max_food_score,
-            SUM(score) AS total_food_score
+            SUM(score) AS total_food_score,
+            SUM(estimated_calories) AS total_estimated_calories,
+            SUM(estimated_protein) AS total_estimated_protein
 
         FROM food_modeled,
             UNNEST(scored_food_line_items) AS sfi
@@ -101,6 +107,8 @@ SELECT
     fa.avg_food_score,
     fa.max_food_score,
     fa.total_food_score,
+    fa.total_estimated_calories,
+    fa.total_estimated_protein,
 
     -- Extract total_miles_run from the final array in the outer SELECT
     (
