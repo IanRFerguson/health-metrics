@@ -17,8 +17,10 @@ dependencies = [
     "pandas",
     "resend>=2.22.0",
     "google-genai>=1.65.0",
-    "pre-commit>=4.6.0",
 ]
+
+[dependency-groups]
+development = ["ruff>=0.15.17", "pre-commit>=4.6.0"]
 
 
 [tool.ruff]
