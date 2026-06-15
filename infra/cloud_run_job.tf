@@ -14,7 +14,7 @@ resource "google_cloud_run_v2_job" "load_job" {
         image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
         command = ["uv"]
-        args    = ["run", "/app/src/health_data/main.py"]
+        args    = ["run", "/app/src/health_data/run_health_data.py"]
 
         env {
           name  = "STAGE"
@@ -100,7 +100,7 @@ resource "google_cloud_run_v2_job" "gemini_annotations" {
         image = "us-central1-docker.pkg.dev/ian-is-online/health-metrics/pipeline-image:latest"
 
         command = ["uv"]
-        args    = ["run", "/app/src/scores/main.py"]
+        args    = ["run", "/app/src/scores/run_gemini_health_scores.py"]
 
         env {
           name  = "STAGE"
