@@ -32,6 +32,6 @@ Please include the date ranges included in your analysis.
 Some assumptions you can make:
 * I am targeting a goal weight of 200 pounds.
 * My goal is to run 10 miles per week.
-* I subscribe to the 80/20 diet, so 80% of my diet should be healthy whole foods and 20% can be more indulgent foods.
+* I strive to eat healthy, balanced meals, but I do enjoy the occasional treat and don't want to be too restrictive with my diet. My goal is to eat a lot of protein, vegetables, and healthy fats, while limiting my intake of processed foods and added sugars.
 * If there's a day with no food logs, assume that I took the day off from tracking (i.e., this is not an error in the data, but rather a conscious choice to not track that day).
 """
