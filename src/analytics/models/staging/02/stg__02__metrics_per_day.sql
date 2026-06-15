@@ -33,11 +33,12 @@ WITH
         SELECT
 
             surrogate_line_item_pk,
-            score,
-            estimated_calories,
-            estimated_protein
+            MAX(score) AS score,
+            MIN(estimated_calories) AS estimated_calories,
+            MAX(estimated_protein) AS estimated_protein
 
         FROM {{ source("scored_records", "stg__02__food_intake_scored") }}
+        GROUP BY 1
     ),
 
     food_modeled AS (
