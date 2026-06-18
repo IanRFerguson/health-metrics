@@ -20,7 +20,7 @@ def get_weekly_stats():
     query = """
     SELECT 
         * 
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_week`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_week`
     WHERE EXTRACT(YEAR FROM start_date) = EXTRACT(YEAR FROM CURRENT_DATE())
     ORDER BY start_date
     """
@@ -49,7 +49,7 @@ def get_daily_stats():
     SELECT 
         * EXCEPT(target_date),
         target_date AS start_date
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_day`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_day`
     WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
     ORDER BY target_date
     """
@@ -85,7 +85,7 @@ def get_monthly_stats():
         avg_step_count,
         avg_weight_lb,
         weight_loss_since_new_year_pct
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_month`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_month`
     WHERE year = EXTRACT(YEAR FROM CURRENT_DATE())
     ORDER BY year, month
     """

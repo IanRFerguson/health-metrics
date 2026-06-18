@@ -20,7 +20,7 @@ def get_total_miles_run():
     query = """
     SELECT 
         SUM(total_miles_run) AS total_miles_run
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_week`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_week`
     WHERE EXTRACT(YEAR FROM start_date) = EXTRACT(YEAR FROM CURRENT_DATE())
     """
     metrics_logger.debug(f"Executing query: {query}")
@@ -48,7 +48,7 @@ def get_weekly_running_goal_met():
     query = """
     SELECT 
         COUNTIF(running_goal_met) / COUNT(*) AS pct_weeks_running_goal_met
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_week`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_week`
     WHERE EXTRACT(YEAR FROM start_date) = EXTRACT(YEAR FROM CURRENT_DATE())
         AND NOT _is_current_week
     """
@@ -80,7 +80,7 @@ def get_workout_stats():
         query = """
             SELECT 
                 *
-            FROM `ian-is-online.dbt_health_metrics_analytics.workouts`
+            FROM `ian-is-online.health_metrics_marts.workouts`
             WHERE EXTRACT(YEAR FROM target_date) = EXTRACT(YEAR FROM CURRENT_DATE())
             ORDER BY target_date ASC
             """
@@ -88,7 +88,7 @@ def get_workout_stats():
         query = """
             SELECT 
                 *
-            FROM `ian-is-online.dbt_health_metrics_analytics.workouts_aggregated`
+            FROM `ian-is-online.health_metrics_marts.workouts_aggregated`
             WHERE year = EXTRACT(YEAR FROM CURRENT_DATE())
             ORDER BY year, month, workout_type
             """

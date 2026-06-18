@@ -20,7 +20,7 @@ def get_dbt_last_updated_at():
     query = """
     SELECT 
         MAX(_dbt_last_run_at) AS last_updated_at
-    FROM `ian-is-online.dbt_health_metrics_analytics.metrics_per_week`
+    FROM `ian-is-online.health_metrics_marts.metrics_per_week`
     """
     metrics_logger.debug(f"Executing query: {query}")
 
