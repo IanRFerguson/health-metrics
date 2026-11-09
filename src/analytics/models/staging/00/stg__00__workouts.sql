@@ -19,13 +19,28 @@ WITH
             CAST(max_heart_rate__bpm AS FLOAT64) AS max_heart_rate,
             CAST(avg_heart_rate__bpm AS FLOAT64) AS average_heart_rate,
 
-            CAST(distance__mi AS FLOAT64) AS distance_in_miles,
-            CAST(avg_speed_mi_hr AS FLOAT64) AS average_speed,
+            -- NOTE: The export app has shipped both imperial and metric
+            -- units (switched to metric in Nov 2026), so we normalize
+            -- everything to imperial here
+            COALESCE(
+                SAFE_CAST(distance__mi AS FLOAT64),
+                SAFE_CAST(distance__km AS FLOAT64) / 1.609344
+            ) AS distance_in_miles,
+            COALESCE(
+                SAFE_CAST(avg_speed_mi_hr AS FLOAT64),
+                SAFE_CAST(avg_speed__km_hr AS FLOAT64) / 1.609344
+            ) AS average_speed,
             CAST(step_count__count AS FLOAT64) AS step_count,
             CAST(step_cadence__spm AS FLOAT64) AS step_cadence,
             CAST(flights_climbed__count AS FLOAT64) AS flights_climbed,
-            CAST(elevation_ascended__ft AS FLOAT64) AS elevation_ascended,
-            CAST(elevation_descended__ft AS FLOAT64) AS elevation_descended,
+            COALESCE(
+                SAFE_CAST(elevation_ascended__ft AS FLOAT64),
+                SAFE_CAST(elevation_ascended__m AS FLOAT64) * 3.28084
+            ) AS elevation_ascended,
+            COALESCE(
+                SAFE_CAST(elevation_descended__ft AS FLOAT64),
+                SAFE_CAST(elevation_descended__m AS FLOAT64) * 3.28084
+            ) AS elevation_descended,
 
             _load_timestamp
 

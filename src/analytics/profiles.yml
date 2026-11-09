@@ -3,11 +3,10 @@ health_metrics:
   outputs:
     dev:
       type: bigquery
-      method: service-account
+      method: oauth
       project: ian-is-online
       dataset: dbt_dev
       threads: 4
-      keyfile: ../../service_accounts/ian-is-online-e8d79794493b.json
       location: us
 
       # NOTE - These resources are managed with Terraform
