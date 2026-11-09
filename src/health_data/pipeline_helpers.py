@@ -1,8 +1,9 @@
+import io
 import tempfile
 from datetime import datetime
 
 import polars as pl
-from google.cloud import storage
+from google.cloud import bigquery, storage
 from klondike.gcp.bigquery import BigQueryConnector
 from log_helpers import compare_logged_flat_files, log_loaded_flat_files
 
@@ -84,6 +85,48 @@ def read_dataframe_from_gcs(
     )
 
     return df
+
+
+def append_dataframe_to_bigquery(
+    bigquery_client: BigQueryConnector,
+    df: pl.DataFrame,
+    table_name: str,
+) -> None:
+    """
+    Appends a DataFrame to a BigQuery table, allowing the table schema to evolve.
+
+    Columns that are new in the DataFrame are added to the table as NULLABLE
+    columns, and columns missing from the DataFrame are left NULL. This means
+    upstream changes to the CSV export (e.g., new fields or a switch in units)
+    won't break the load.
+
+    NOTE: We go through the underlying `google.cloud.bigquery` client because
+    `klondike.write_dataframe` doesn't pass `schema_update_options` through to
+    the load job.
+
+    Args:
+        bigquery_client (BigQueryConnector): BigQuery client to write to BigQuery
+        df (pl.DataFrame): DataFrame to append
+        table_name (str): Destination table name (`dataset.table`)
+    """
+
+    job_config = bigquery.LoadJobConfig(
+        source_format=bigquery.SourceFormat.PARQUET,
+        write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
+        schema_update_options=[
+            bigquery.SchemaUpdateOption.ALLOW_FIELD_ADDITION,
+            bigquery.SchemaUpdateOption.ALLOW_FIELD_RELAXATION,
+        ],
+    )
+
+    with io.BytesIO() as stream:
+        df.write_parquet(stream)
+        stream.seek(0)
+        load_job = bigquery_client.client.load_table_from_file(
+            stream, destination=table_name, job_config=job_config
+        )
+
+    load_job.result()
 
 
 def truncate_single_source(
@@ -192,13 +235,15 @@ def load_source_data_to_bigquery(
     ###
 
     # If we have any successfully loaded dataframes, we'll concatenate them
-    # and write them to BigQuery in a single operation
+    # and write them to BigQuery in a single operation. Files don't always share
+    # the same columns (e.g., the export app switches units), so we concatenate
+    # diagonally - columns missing from a given file are filled with NULLs
     if dataframes:
-        df = pl.concat(dataframes, how="vertical_relaxed")
-        bigquery_client.write_dataframe(
+        df = pl.concat(dataframes, how="diagonal_relaxed")
+        append_dataframe_to_bigquery(
+            bigquery_client=bigquery_client,
             df=df,
             table_name=f"{destination_schema}.{destination_table}",
-            if_exists="append",
         )
         metrics_logger.info(
             f"* Successfully loaded {len(dataframes)} files into BigQuery"
