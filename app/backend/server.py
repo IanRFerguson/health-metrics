@@ -10,7 +10,7 @@ from common.logger import metrics_logger
 server = Flask(
     __name__,
     static_folder="frontend/dist",
-    static_url_path="/",
+    static_url_path="/static",
     template_folder="frontend/dist",
 )
 server.logger = metrics_logger
