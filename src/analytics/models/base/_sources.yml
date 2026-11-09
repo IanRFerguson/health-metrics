@@ -4,3 +4,4 @@ sources:
       - name: apple_health_metrics
       - name: apple_workouts
       - name: food_diary_2026
+      - name: food_diary_backfill
