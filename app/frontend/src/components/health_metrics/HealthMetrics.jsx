@@ -7,6 +7,7 @@ import MilesPlot from "./plots/Miles.jsx";
 import WeightPlot from "./plots/Weight.jsx";
 import WorkoutsPlot from "./plots/Workouts.jsx";
 import FoodScores from "./plots/FoodScores.jsx";
+import DaysOfTheWeekPlot from "./plots/DaysOfTheWeek.jsx";
 
 
 import { CACHE_DURATION_MS } from "../Constants.js";
@@ -125,6 +126,7 @@ function HealthMetrics() {
         { key: 'avg_weight_lb', plot_component: WeightPlot, label: 'Weight' },
         { key: 'workouts', plot_component: WorkoutsPlot, label: 'Workouts', endpoint: '/api/workout-stats?daily={daily}', formatFn: formatWorkoutsData },
         { key: 'food_scores', plot_component: FoodScores, label: 'Food Scores' },
+        { key: 'dow', plot_component: DaysOfTheWeekPlot, label: 'Days of the Week', endpoint: '/api/dow-stats' },
     ];
 
     // This is the value that's currently selected from the dropdown
