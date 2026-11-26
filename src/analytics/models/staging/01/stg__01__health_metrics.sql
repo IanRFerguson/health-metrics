@@ -98,5 +98,11 @@ SELECT
     }} AS surrogate_pk
 
 FROM health_metrics
-LEFT JOIN workouts ON health_metrics.target_date = workouts.target_date AND health_metrics.time_of_day = workouts.time_of_day
-LEFT JOIN food_intake USING (target_date, time_of_day)
+LEFT JOIN workouts
+    ON
+        health_metrics.target_date = workouts.target_date
+        AND health_metrics.time_of_day = workouts.time_of_day
+LEFT JOIN food_intake
+    ON
+        health_metrics.target_date = food_intake.target_date
+        AND health_metrics.time_of_day = food_intake.time_of_day

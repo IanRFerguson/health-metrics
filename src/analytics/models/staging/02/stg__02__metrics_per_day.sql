@@ -38,7 +38,7 @@ WITH
             MAX(estimated_protein) AS estimated_protein
 
         FROM {{ source("scored_records", "stg__02__food_intake_scored") }}
-        GROUP BY 1
+        GROUP BY surrogate_line_item_pk
     ),
 
     food_modeled AS (
@@ -59,7 +59,7 @@ WITH
             UNNEST(base.food_line_items) AS fli
         LEFT JOIN food_raw AS fr
             ON fli.surrogate_line_item_pk = fr.surrogate_line_item_pk
-        GROUP BY 1
+        GROUP BY base.target_date
     ),
 
     food_agg AS (
@@ -75,7 +75,7 @@ WITH
 
         FROM food_modeled,
             UNNEST(scored_food_line_items) AS sfi
-        GROUP BY 1
+        GROUP BY target_date
     ),
 
     staged AS (
@@ -94,7 +94,7 @@ WITH
             ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts
 
         FROM base
-        GROUP BY 1
+        GROUP BY target_date
     )
 
 
@@ -123,6 +123,9 @@ SELECT
     ) AS total_miles_run
 
 FROM staged
-LEFT JOIN weight_modeled AS wm ON staged.target_date = wm.target_date
-LEFT JOIN food_modeled AS fm USING (target_date)
-LEFT JOIN food_agg AS fa USING (target_date)
+LEFT JOIN weight_modeled AS wm
+    ON staged.target_date = wm.target_date
+LEFT JOIN food_modeled AS fm
+    ON staged.target_date = fm.target_date
+LEFT JOIN food_agg AS fa
+    ON staged.target_date = fa.target_date

@@ -1,5 +1,5 @@
 WITH
--- NOTE: We might want to flip this over to the 02 model at some point
+    -- NOTE: We might want to flip this over to the 02 model at some point
     base AS (
         SELECT
             {{
