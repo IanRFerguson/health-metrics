@@ -1,6 +1,13 @@
+{{ 
+config(
+  enabled=false
+  )
+}}
+
 SELECT
-  
-  fl.surrogate_line_item_pk,
+    
+  fl.surrogat
+e_line_item_pk,
   fl.food_line_item AS line_item,
   COUNT(*) AS n
 

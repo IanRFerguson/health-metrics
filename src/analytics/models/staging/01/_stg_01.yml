@@ -1,0 +1,11 @@
+models:
+  - name: stg__01__food_intake
+    description: "Aggregate counts of logged food items (joinable via surrogate PK)"
+  
+  - name: stg__01__health_metrics
+    description: "Health metrics aggregated by date and time of day (e.g., morning, afternoon, evening)"
+    tests:
+      - unique:
+          column_name: surrogate_pk
+      - not_null:
+          column_name: surrogate_pk

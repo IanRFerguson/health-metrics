@@ -1,0 +1,20 @@
+models:
+  - name: stg__02__metrics_per_day
+    description: "Represents one row per day, with scored food items and workout stats joined in"
+
+
+  - name: stg__02__metrics_per_month
+    description: "Rolls up daily metrics to a monthly level"
+
+
+  - name: stg__02__metrics_per_week
+    description: "Rolls up daily metrics to a weekly level"
+
+
+  - name: stg__02__workouts_aggregated
+    description: "Aggregated workout stats by year and month"
+
+
+  - name: stg__02__workouts
+    description: "Represents one row per workout"
+

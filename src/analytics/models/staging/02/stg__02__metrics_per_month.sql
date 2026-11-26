@@ -1,103 +1,95 @@
 WITH
-    daily_stats AS (
-        SELECT 
-            
-            EXTRACT(YEAR FROM target_date) AS year,
-            EXTRACT(MONTH FROM target_date) AS month,
+daily_stats AS (
+    SELECT
 
-            -- Ring stats
-            ROUND(SUM(total_active_energy_kcal) / COUNT(*), 3) AS avg_active_energy_kcal,
-            ROUND(SUM(total_exercise_minutes) / COUNT(*), 3) AS avg_exercise_minutes,
-            ROUND(SUM(total_stand_count) / COUNT(*), 3) AS avg_stand_count,
-            ROUND(SUM(total_step_count) / COUNT(*), 3) AS avg_step_count,
+        EXTRACT(YEAR FROM target_date) AS year,
+        EXTRACT(MONTH FROM target_date) AS month,
 
-            -- Weight
-            MIN(max_weight_lb) AS min_weight_lb,
-            ROUND(AVG(max_weight_lb), 3) AS avg_weight_lb,
-            MAX(max_weight_lb) AS max_weight_lb
-        
-        FROM {{ ref("stg__02__metrics_per_day") }}
-        GROUP BY 1,2
-    ),
+        -- Ring stats
+        ROUND(SUM(total_active_energy_kcal) / COUNT(*), 3)
+            AS avg_active_energy_kcal,
+        ROUND(SUM(total_exercise_minutes) / COUNT(*), 3)
+            AS avg_exercise_minutes,
+        ROUND(SUM(total_stand_count) / COUNT(*), 3) AS avg_stand_count,
+        ROUND(SUM(total_step_count) / COUNT(*), 3) AS avg_step_count,
 
-    weekly_stats AS (
-        SELECT 
-            EXTRACT(YEAR FROM start_date) AS year,
-            EXTRACT(MONTH FROM start_date) AS month,
-            
-            -- High-level workout status
-            SUM(running_workouts) / NULLIF(COUNT(DISTINCT start_date), 0) AS avg_running_workouts_per_week,
-            COUNTIF(running_goal_met) AS weeks_running_goal_met,
-            COUNTIF(running_goal_met) / NULLIF(COUNT(DISTINCT start_date), 0) AS pct_weeks_running_goal_met
-        
-        FROM {{ ref("stg__02__metrics_per_week") }}
-        GROUP BY 1,2
-    ),
+        -- Weight
+        MIN(max_weight_lb) AS min_weight_lb,
+        ROUND(AVG(max_weight_lb), 3) AS avg_weight_lb,
+        MAX(max_weight_lb) AS max_weight_lb
 
-    workout_stats AS (
-        SELECT 
-            EXTRACT(YEAR FROM workout_date) AS year,
-            EXTRACT(MONTH FROM workout_date) AS month,
-            COUNT(*) AS total_workouts,
-            COUNTIF(UPPER(workout_type) LIKE '%RUN%') AS running_workouts,
-            COUNTIF(UPPER(workout_type) LIKE '%STRENGTH%') AS strength_workouts,
-            COUNTIF(high_impact) AS high_impact_workouts,
-            ROUND(SUM(
-                CASE 
-                    WHEN UPPER(workout_type) LIKE '%RUN%' THEN distance_in_miles 
-                    ELSE 0 
-                END
-            ), 3) AS total_miles_run
-        FROM {{ ref("stg__00__workouts") }}
-        GROUP BY 1,2
-    ),
+    FROM {{ ref("stg__02__metrics_per_day") }}
+    GROUP BY 1, 2
+),
 
-    sleep_stats AS (
-        SELECT 
-            
-            EXTRACT(YEAR FROM target_date) AS year,
-            EXTRACT(MONTH FROM target_date) AS month,
-            ROUND(AVG(sm.sleep__total_hr), 3) AS avg_sleep_total_hr,
-            ROUND(AVG(sm.sleep__awake_hr), 3) AS avg_sleep_awake_hr,
-            ROUND(AVG(sm.sleep__core_hr), 3) AS avg_sleep_core_hr,
-            ROUND(AVG(sm.sleep__deep_hr), 3) AS avg_sleep_deep_hr,
-            ROUND(AVG(sm.sleep__rem_hr), 3) AS avg_sleep_rem_hr
+weekly_stats AS (
+    SELECT
+        EXTRACT(YEAR FROM start_date) AS year,
+        EXTRACT(MONTH FROM start_date) AS month,
 
-        FROM {{ ref("stg__02__metrics_per_day") }} AS mpd,
-            UNNEST(mpd.all_sleep_metrics) AS sm
-        GROUP BY 1,2
-    ),
+        -- High-level workout status
+        SUM(running_workouts)
+        / NULLIF(COUNT(DISTINCT start_date), 0)
+            AS avg_running_workouts_per_week,
+        COUNTIF(running_goal_met) AS weeks_running_goal_met,
+        COUNTIF(running_goal_met)
+        / NULLIF(COUNT(DISTINCT start_date), 0) AS pct_weeks_running_goal_met
 
-    joined AS (
-        SELECT 
-            *
-        FROM weekly_stats
-        LEFT JOIN daily_stats USING (year, month)
-        LEFT JOIN workout_stats USING (year, month)
-        LEFT JOIN sleep_stats USING (year, month)
-        ORDER BY year, month
-    )
+    FROM {{ ref("stg__02__metrics_per_week") }}
+    GROUP BY 1, 2
+),
 
-SELECT 
-    
+workout_stats AS (
+    SELECT
+        EXTRACT(YEAR FROM workout_date) AS year,
+        EXTRACT(MONTH FROM workout_date) AS month,
+        COUNT(*) AS total_workouts,
+        COUNTIF(UPPER(workout_type) LIKE '%RUN%') AS running_workouts,
+        COUNTIF(UPPER(workout_type) LIKE '%STRENGTH%') AS strength_workouts,
+        COUNTIF(high_impact) AS high_impact_workouts,
+        ROUND(SUM(
+            CASE
+                WHEN UPPER(workout_type) LIKE '%RUN%' THEN distance_in_miles
+                ELSE 0
+            END
+        ), 3) AS total_miles_run
+    FROM {{ ref("stg__00__workouts") }}
+    GROUP BY 1, 2
+),
+
+joined AS (
+    SELECT *
+    FROM weekly_stats
+    LEFT JOIN daily_stats USING (year, month)
+    LEFT JOIN workout_stats USING (year, month)
+    ORDER BY year, month
+)
+
+SELECT
+
     *,
     ROUND((
-        avg_step_count - LAG(avg_step_count) OVER (ORDER BY year,month)) 
-        / NULLIF(LAG(avg_step_count) OVER (ORDER BY year,month), 0
+        avg_step_count - LAG(avg_step_count) OVER (ORDER BY year, month)
+    )
+    / NULLIF(LAG(avg_step_count) OVER (ORDER BY year, month), 0
     ) * 100.0, 3) AS step_count_pct_change,
-    
-    ROUND((
-        avg_weight_lb - LAG(avg_weight_lb) OVER (ORDER BY year,month)) 
-        / NULLIF(LAG(avg_weight_lb) OVER (ORDER BY year,month), 0
-    ) * 100.0, 3) AS weight_pct_change,
-    
-    -- Total weight loss since new years
-    ROUND((avg_weight_lb - 220.2) / 220.2 * 100.0, 3) AS weight_loss_since_new_year_pct,
 
     ROUND((
-        avg_running_workouts_per_week - LAG(avg_running_workouts_per_week) OVER (ORDER BY year,month)) 
-        / NULLIF(LAG(avg_running_workouts_per_week) OVER (ORDER BY year,month), 0
+        avg_weight_lb - LAG(avg_weight_lb) OVER (ORDER BY year, month)
+    )
+    / NULLIF(LAG(avg_weight_lb) OVER (ORDER BY year, month), 0
+    ) * 100.0, 3) AS weight_pct_change,
+
+    -- Total weight loss since new years
+    ROUND((avg_weight_lb - 220.2) / 220.2 * 100.0, 3)
+        AS weight_loss_since_new_year_pct,
+
+    ROUND((
+        avg_running_workouts_per_week
+        - LAG(avg_running_workouts_per_week) OVER (ORDER BY year, month)
+    )
+    / NULLIF(LAG(avg_running_workouts_per_week) OVER (ORDER BY year, month), 0
     ) * 100.0, 3) AS runs_per_week_pct_change
-    
+
 FROM joined
 ORDER BY year, month

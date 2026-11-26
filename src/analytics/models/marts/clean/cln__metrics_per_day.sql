@@ -8,8 +8,8 @@ SELECT
 
     {{
         dbt_utils.star(
-            from=ref("stg__02__metrics_per_day")
+            from=ref("stg__03__metrics_per_day")
         )
     }}
 
-FROM {{ ref("stg__02__metrics_per_day") }}
+FROM {{ ref("stg__03__metrics_per_day") }}
