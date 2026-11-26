@@ -12,48 +12,35 @@ WITH
 
     food_scores AS (
         SELECT
-        
-            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+
+            DATE_TRUNC(target_date, WEEK (MONDAY)) AS start_date,
             SUM(total_food_score) AS total_food_score,
             SUM(total_food_score) / COUNT(DISTINCT target_date) AS avg_food_score,
             AVG(min_food_score) AS avg_min_food_score,
             AVG(max_food_score) AS avg_max_food_score
-        
-        FROM {{ ref("stg__02__metrics_per_day") }}
-        GROUP BY 1
-    ),
 
-    sleep_scores AS (
-        SELECT
-        
-            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
-            ROUND(AVG(sm.sleep__total_hr), 3) AS avg_sleep_total_hr,
-            ROUND(AVG(sm.sleep__awake_hr), 3) AS avg_sleep_awake_hr,
-            ROUND(AVG(sm.sleep__core_hr), 3) AS avg_sleep_core_hr,
-            ROUND(AVG(sm.sleep__deep_hr), 3) AS avg_sleep_deep_hr,
-            ROUND(AVG(sm.sleep__rem_hr), 3) AS avg_sleep_rem_hr
-        
-        FROM {{ ref("stg__02__metrics_per_day") }},
-            UNNEST(all_sleep_metrics) AS sm
+        FROM {{ ref("stg__02__metrics_per_day") }}
         GROUP BY 1
     ),
 
     workout_metrics AS (
         SELECT
 
-            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+            DATE_TRUNC(target_date, WEEK (MONDAY)) AS start_date,
             COUNTIF(dw.high_impact) AS high_impact_workouts,
             COUNTIF(dw.workout_type LIKE '%STRENGTH%') AS strength_workouts,
             COUNTIF(dw.workout_type LIKE '%RUN%') AS running_workouts,
             ROUND(
                 SUM(
-                    CASE 
-                        WHEN dw.workout_type LIKE '%RUN%' THEN dw.distance_in_miles 
-                        ELSE 0 
+                    CASE
+                        WHEN dw.workout_type LIKE '%RUN%' THEN dw.distance_in_miles
+                        ELSE 0
                     END
-                ), 
-            3) AS total_miles_run,
-            {{ format_pace_string("COALESCE(CAST(AVG(dw.pace_seconds) AS INT64), 0)") }} AS pace
+                ),
+                3
+            ) AS total_miles_run,
+            {{ format_pace_string("COALESCE(CAST(AVG(dw.pace_seconds) AS INT64), 0)") }}
+                AS pace
 
         FROM base
         LEFT JOIN UNNEST(base.daily_workouts) AS dw
@@ -63,7 +50,7 @@ WITH
     staged AS (
         SELECT
 
-            DATE_TRUNC(target_date, WEEK(MONDAY)) AS start_date,
+            DATE_TRUNC(target_date, WEEK (MONDAY)) AS start_date,
 
             -- TOTALS
             ROUND(SUM(sum_active_energy_kcal), 3) AS total_active_energy_kcal,
@@ -73,37 +60,47 @@ WITH
             ROUND(SUM(sum_stand_count), 3) AS total_stand_count,
             ROUND(SUM(sum_flights_climbed), 3) AS total_flights_climbed,
             ROUND(SUM(sum_step_count), 3) AS total_step_count,
-            
+
             -- Weight
             MIN(weight_lb) AS min_weight_lb,
             ROUND(AVG(weight_lb), 3) AS avg_weight_lb,
             MAX(weight_lb) AS max_weight_lb,
-            
+
             -- Food scores
             SUM(total_food_score) / COUNT(*) AS food_score,
             MIN(avg_min_food_score) AS avg_min_food_score,
             MAX(avg_max_food_score) AS avg_max_food_score,
 
             COUNT(*) AS days_recorded
-        
+
         FROM base
         LEFT JOIN food_scores
-            ON DATE_TRUNC(base.target_date, WEEK(MONDAY)) = food_scores.start_date
+            ON DATE_TRUNC(base.target_date, WEEK (MONDAY)) = food_scores.start_date
         GROUP BY 1
     )
 
-SELECT 
-    
+SELECT
+
     staged.*,
 
     -- AVERAGES
-    ROUND(staged.total_active_energy_kcal / NULLIF(staged.days_recorded, 0), 3) AS avg_active_energy_kcal,
-    ROUND(staged.total_physical_effort_kcal / NULLIF(staged.days_recorded, 0), 3) AS avg_physical_effort_kcal,
-    ROUND(staged.total_resting_energy_kcal / NULLIF(staged.days_recorded, 0), 3) AS avg_resting_energy_kcal,
-    ROUND(staged.total_exercise_minutes / NULLIF(staged.days_recorded, 0), 3) AS avg_exercise_minutes,
-    ROUND(staged.total_stand_count / NULLIF(staged.days_recorded, 0), 3) AS avg_stand_count,
-    ROUND(staged.total_flights_climbed / NULLIF(staged.days_recorded, 0), 3) AS avg_flights_climbed,
-    ROUND(staged.total_step_count / NULLIF(staged.days_recorded, 0), 3) AS avg_step_count,
+    ROUND(
+        staged.total_active_energy_kcal / NULLIF(staged.days_recorded, 0), 3
+    ) AS avg_active_energy_kcal,
+    ROUND(
+        staged.total_physical_effort_kcal / NULLIF(staged.days_recorded, 0), 3
+    ) AS avg_physical_effort_kcal,
+    ROUND(
+        staged.total_resting_energy_kcal / NULLIF(staged.days_recorded, 0), 3
+    ) AS avg_resting_energy_kcal,
+    ROUND(staged.total_exercise_minutes / NULLIF(staged.days_recorded, 0), 3)
+        AS avg_exercise_minutes,
+    ROUND(staged.total_stand_count / NULLIF(staged.days_recorded, 0), 3)
+        AS avg_stand_count,
+    ROUND(staged.total_flights_climbed / NULLIF(staged.days_recorded, 0), 3)
+        AS avg_flights_climbed,
+    ROUND(staged.total_step_count / NULLIF(staged.days_recorded, 0), 3)
+        AS avg_step_count,
 
     workout_metrics.high_impact_workouts,
     workout_metrics.strength_workouts,
@@ -112,16 +109,9 @@ SELECT
     workout_metrics.total_miles_run >= 10.0 AS running_goal_met,
     workout_metrics.pace AS avg_pace,
 
-    sleep_scores.avg_sleep_total_hr,
-    sleep_scores.avg_sleep_awake_hr,
-    sleep_scores.avg_sleep_core_hr,
-    sleep_scores.avg_sleep_deep_hr,
-    sleep_scores.avg_sleep_rem_hr,
-    
     CURRENT_TIMESTAMP() AS _dbt_last_run_at,
-    DATE_TRUNC(CURRENT_DATE(), WEEK(MONDAY)) = staged.start_date AS _is_current_week
-
+    DATE_TRUNC(CURRENT_DATE(), WEEK (MONDAY))
+    = staged.start_date AS _is_current_week
 
 FROM staged
-LEFT JOIN workout_metrics USING(start_date)
-LEFT JOIN sleep_scores USING(start_date)
+LEFT JOIN workout_metrics ON staged.start_date = workout_metrics.start_date

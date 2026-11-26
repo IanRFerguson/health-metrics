@@ -1,0 +1,3 @@
+models:
+  - name: analytics__threshold_by_day
+    description: "Determines if sufficient thresholds are met to consider a day 'good' for health metrics"

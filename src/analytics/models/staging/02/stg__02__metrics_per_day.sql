@@ -1,13 +1,13 @@
-WITH 
+WITH
     base AS (
-        SELECT 
-        
+        SELECT
+
             {{
                 dbt_utils.star(
                     ref("stg__01__health_metrics")
                 )
             }}
-        
+
         FROM {{ ref("stg__01__health_metrics") }}
     ),
 
@@ -38,7 +38,7 @@ WITH
             MAX(estimated_protein) AS estimated_protein
 
         FROM {{ source("scored_records", "stg__02__food_intake_scored") }}
-        GROUP BY 1
+        GROUP BY surrogate_line_item_pk
     ),
 
     food_modeled AS (
@@ -59,7 +59,7 @@ WITH
             UNNEST(base.food_line_items) AS fli
         LEFT JOIN food_raw AS fr
             ON fli.surrogate_line_item_pk = fr.surrogate_line_item_pk
-        GROUP BY 1
+        GROUP BY base.target_date
     ),
 
     food_agg AS (
@@ -75,12 +75,12 @@ WITH
 
         FROM food_modeled,
             UNNEST(scored_food_line_items) AS sfi
-        GROUP BY 1
+        GROUP BY target_date
     ),
 
     staged AS (
         SELECT
-            
+
             target_date,
             ROUND(SUM(sum_active_energy_kcal), 3) AS total_active_energy_kcal,
             ROUND(SUM(sum_physical_effort_kcal), 3) AS total_physical_effort_kcal,
@@ -89,16 +89,15 @@ WITH
             ROUND(SUM(sum_stand_count), 3) AS total_stand_count,
             ROUND(SUM(sum_flights_climbed), 3) AS total_flights_climbed,
             ROUND(SUM(sum_step_count), 3) AS total_step_count,
-            
+
             -- Use ARRAY_CONCAT_AGG only if base has multiple rows per date
-            ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts,
-            ARRAY_CONCAT_AGG(sleep_metrics) AS all_sleep_metrics
-        
+            ARRAY_CONCAT_AGG(daily_workouts) AS all_daily_workouts
+
         FROM base
-        GROUP BY 1
+        GROUP BY target_date
     )
 
-    
+
 SELECT
 
     staged.*,
@@ -124,6 +123,9 @@ SELECT
     ) AS total_miles_run
 
 FROM staged
-LEFT JOIN weight_modeled AS wm USING (target_date)
-LEFT JOIN food_modeled AS fm USING (target_date)
-LEFT JOIN food_agg AS fa USING (target_date)
+LEFT JOIN weight_modeled AS wm
+    ON staged.target_date = wm.target_date
+LEFT JOIN food_modeled AS fm
+    ON staged.target_date = fm.target_date
+LEFT JOIN food_agg AS fa
+    ON staged.target_date = fa.target_date

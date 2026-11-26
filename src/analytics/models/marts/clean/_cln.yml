@@ -1,0 +1,18 @@
+models:
+  - name: cln__health_metrics_summary
+    description: "View built on top of stg__01__health_metrics and ordered by day (most recent first)"
+
+  - name: cln__metrics_per_day
+    description: "One row per day"
+
+  - name: cln__metrics_per_month
+    description: "One row per month"
+
+  - name: cln__metrics_per_week
+    description: "One row per week"
+
+  - name: cln__workouts_aggregated
+    description: "Aggregated workout stats by year and month"
+
+  - name: cln__workouts
+    description: "One row per workout all-time"

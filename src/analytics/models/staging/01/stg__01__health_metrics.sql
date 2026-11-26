@@ -7,7 +7,7 @@ WITH
             ARRAY_AGG(
                 STRUCT(
                     food_line_item,
-                    {{ 
+                    {{
                         dbt_utils.generate_surrogate_key(
                             [
                                 "food_line_item"
@@ -18,7 +18,10 @@ WITH
             ) AS food_line_items
 
         FROM (
-            SELECT DISTINCT load_date, time_of_day, food_line_item
+            SELECT DISTINCT
+                load_date,
+                time_of_day,
+                food_line_item
             FROM {{ ref("stg__00__food_journal") }}
         )
         GROUP BY ALL
@@ -37,7 +40,9 @@ WITH
                     pace_seconds,
                     {{ format_pace_string("pace_seconds") }} AS pace,
                     workout_duration,
-                    TIME_DIFF(CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE) AS duration_minutes,
+                    TIME_DIFF(
+                        CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE
+                    ) AS duration_minutes,
                     total_energy,
                     active_energy,
                     max_heart_rate,
@@ -47,28 +52,7 @@ WITH
             ) AS daily_workouts
 
         FROM {{ ref("stg__00__workouts") }}
-        GROUP BY 1,2
-    ),
-
-    sleep_metrics AS (
-        SELECT
-            measurement_date,
-            '00-MORNING' AS time_of_day, -- Sleep metrics are only recorded in the morning, so we can hardcode this value
-            ARRAY_AGG(
-                STRUCT(
-                    sleep__asleep_hr,
-                    sleep__awake_hr,
-                    sleep__core_hr,
-                    sleep__deep_hr,
-                    sleep__in_bed_hr,
-                    sleep__rem_hr,
-                    sleep__total_hr,
-                    surrogate_pk AS sleep_metrics_pk
-                )
-            ) AS sleep_metrics
-        FROM {{ ref("stg__00__sleep") }}
-        WHERE sleep__is_valid -- This filters out naps
-        GROUP BY 1
+        GROUP BY 1, 2
     ),
 
     health_metrics AS (
@@ -85,7 +69,6 @@ WITH
             ROUND(SUM(flights_climbed), 3) AS sum_flights_climbed,
             ROUND(SUM(step_count), 3) AS sum_step_count,
             MAX(`weight`) AS weight_lb
-
 
         FROM {{ ref("stg__00__health_metrics") }}
         GROUP BY ALL
@@ -105,7 +88,6 @@ SELECT
     CAST(health_metrics.weight_lb AS FLOAT64) AS weight_lb,
     workouts.daily_workouts,
     food_intake.food_line_items,
-    sleep_metrics.sleep_metrics,
     {{
         dbt_utils.generate_surrogate_key(
             [
@@ -116,8 +98,11 @@ SELECT
     }} AS surrogate_pk
 
 FROM health_metrics
-LEFT JOIN workouts USING(target_date, time_of_day)
-LEFT JOIN food_intake USING(target_date, time_of_day)
-LEFT JOIN sleep_metrics 
-    ON health_metrics.target_date = sleep_metrics.measurement_date
-    AND health_metrics.time_of_day = sleep_metrics.time_of_day 
+LEFT JOIN workouts
+    ON
+        health_metrics.target_date = workouts.target_date
+        AND health_metrics.time_of_day = workouts.time_of_day
+LEFT JOIN food_intake
+    ON
+        health_metrics.target_date = food_intake.target_date
+        AND health_metrics.time_of_day = food_intake.time_of_day
