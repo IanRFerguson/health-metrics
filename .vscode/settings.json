@@ -1,0 +1,17 @@
+{
+    "dbt.dbtIntegration": "fusion",
+    "files.associations": {
+        "*.sql": "jinja-sql"
+    },
+    "sqlfluff.executablePath": "${workspaceFolder}/.venv/bin/sqlfluff",
+    "sqlfluff.workingDirectory": "${workspaceFolder}/src/analytics",
+    "sqlfluff.config": "${workspaceFolder}/src/analytics/.sqlfluff",
+    "[jinja-sql]": {
+        "editor.defaultFormatter": "sqlfluff.vscode-sqlfluff",
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": false,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+    }
+}

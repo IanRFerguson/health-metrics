@@ -6,5 +6,5 @@
 }}
 
 SELECT *
-FROM {{ ref("stg__01__health_metrics") }} 
-ORDER BY target_date DESC, time_of_day
+FROM {{ ref("stg__01__health_metrics") }}
+ORDER BY target_date DESC, time_of_day ASC

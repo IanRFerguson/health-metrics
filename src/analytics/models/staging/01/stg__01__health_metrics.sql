@@ -1,78 +1,78 @@
 WITH
-food_intake AS (
-    SELECT
+    food_intake AS (
+        SELECT
 
-        load_date AS target_date,
-        time_of_day,
-        ARRAY_AGG(
-            STRUCT(
-                food_line_item,
-                    {{ 
+            load_date AS target_date,
+            time_of_day,
+            ARRAY_AGG(
+                STRUCT(
+                    food_line_item,
+                    {{
                         dbt_utils.generate_surrogate_key(
                             [
                                 "food_line_item"
                             ]
                         )
                     }} AS surrogate_line_item_pk
-            )
-        ) AS food_line_items
+                )
+            ) AS food_line_items
 
-    FROM (
-        SELECT DISTINCT
-            load_date,
+        FROM (
+            SELECT DISTINCT
+                load_date,
+                time_of_day,
+                food_line_item
+            FROM {{ ref("stg__00__food_journal") }}
+        )
+        GROUP BY ALL
+    ),
+
+    workouts AS (
+        SELECT
+
+            workout_date AS target_date,
             time_of_day,
-            food_line_item
-        FROM {{ ref("stg__00__food_journal") }}
+            ARRAY_AGG(
+                STRUCT(
+                    workout_type,
+                    high_impact,
+                    distance_in_miles,
+                    pace_seconds,
+                    {{ format_pace_string("pace_seconds") }} AS pace,
+                    workout_duration,
+                    TIME_DIFF(
+                        CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE
+                    ) AS duration_minutes,
+                    total_energy,
+                    active_energy,
+                    max_heart_rate,
+                    average_heart_rate,
+                    step_count AS exercise_step_count
+                )
+            ) AS daily_workouts
+
+        FROM {{ ref("stg__00__workouts") }}
+        GROUP BY 1, 2
+    ),
+
+    health_metrics AS (
+        SELECT
+
+            measurement_date AS target_date,
+            time_of_day,
+            ROUND(SUM(active_energy_kcal), 3) AS sum_active_energy_kcal,
+            ROUND(SUM(physical_effort_kcal_hr_kg), 3) AS sum_physical_effort_kcal,
+            ROUND(SUM(resting_energy_kcal), 3) AS sum_resting_energy_kcal,
+
+            ROUND(SUM(exercise_minutes), 3) AS sum_exercise_minutes,
+            ROUND(SUM(stand_count), 3) AS sum_stand_count,
+            ROUND(SUM(flights_climbed), 3) AS sum_flights_climbed,
+            ROUND(SUM(step_count), 3) AS sum_step_count,
+            MAX(`weight`) AS weight_lb
+
+        FROM {{ ref("stg__00__health_metrics") }}
+        GROUP BY ALL
     )
-    GROUP BY ALL
-),
-
-workouts AS (
-    SELECT
-
-        workout_date AS target_date,
-        time_of_day,
-        ARRAY_AGG(
-            STRUCT(
-                workout_type,
-                high_impact,
-                distance_in_miles,
-                pace_seconds,
-                {{ format_pace_string("pace_seconds") }} AS pace,
-                workout_duration,
-                TIME_DIFF(
-                    CAST(workout_duration AS TIME), TIME '00:00:00', MINUTE
-                ) AS duration_minutes,
-                total_energy,
-                active_energy,
-                max_heart_rate,
-                average_heart_rate,
-                step_count AS exercise_step_count
-            )
-        ) AS daily_workouts
-
-    FROM {{ ref("stg__00__workouts") }}
-    GROUP BY 1, 2
-),
-
-health_metrics AS (
-    SELECT
-
-        measurement_date AS target_date,
-        time_of_day,
-        ROUND(SUM(active_energy_kcal), 3) AS sum_active_energy_kcal,
-        ROUND(SUM(physical_effort_kcal_hr_kg), 3) AS sum_physical_effort_kcal,
-        ROUND(SUM(resting_energy_kcal), 3) AS sum_resting_energy_kcal,
-
-        ROUND(SUM(exercise_minutes), 3) AS sum_exercise_minutes,
-        ROUND(SUM(stand_count), 3) AS sum_stand_count,
-        ROUND(SUM(flights_climbed), 3) AS sum_flights_climbed,
-        ROUND(SUM(step_count), 3) AS sum_step_count,
-        MAX(`weight`) AS weight_lb
-
-    FROM {{ ref("stg__00__health_metrics") }}
-    GROUP BY ALL
-)
 
 SELECT
 
@@ -98,6 +98,5 @@ SELECT
     }} AS surrogate_pk
 
 FROM health_metrics
-LEFT JOIN workouts USING (target_date, time_of_day)
+LEFT JOIN workouts ON health_metrics.target_date = workouts.target_date AND health_metrics.time_of_day = workouts.time_of_day
 LEFT JOIN food_intake USING (target_date, time_of_day)
-

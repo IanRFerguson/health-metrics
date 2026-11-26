@@ -1,15 +1,15 @@
 WITH
     base AS (
         SELECT
-            
-            -- NOTE: This is to buffer against the watch
-            -- assigning the wrong type of workout on start
+
+        -- NOTE: This is to buffer against the watch
+        -- assigning the wrong type of workout on start
             CASE
                 WHEN UPPER(TRIM(`type`)) = 'OTHER'
                     THEN 'STRENGTH (OTHER)'
                 ELSE UPPER(TRIM(`type`))
             END AS workout_type,
-            
+
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `start`) AS workout_start,
             SAFE.PARSE_DATETIME('%Y-%m-%d %H:%M', `end`) AS workout_end,
             CAST(duration AS TIME) AS workout_duration,
@@ -44,7 +44,7 @@ WITH
 
             _load_timestamp
 
-        FROM {{ ref("base__workouts")}}
+        FROM {{ ref("base__workouts") }}
     ),
 
     staged AS (
@@ -56,7 +56,6 @@ WITH
             CASE
                 WHEN workout_type LIKE '%RUN%'
                     THEN CAST(TIME_DIFF(workout_duration, '00:00:00', SECOND) / NULLIF(distance_in_miles, 0) AS INT64)
-                ELSE null
             END AS pace_seconds
 
         FROM base
@@ -87,7 +86,7 @@ SELECT
     step_cadence,
     flights_climbed,
     elevation_ascended,
-    elevation_descended,    
+    elevation_descended,
     _load_timestamp,
     {{
         dbt_utils.generate_surrogate_key(

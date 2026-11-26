@@ -4,3 +4,6 @@ logs/
 
 .user.yml
 dbt_internal_packages/
+
+# sqlfluff stub library bytecode
+.sqlfluff_libs/__pycache__/

@@ -18,10 +18,15 @@ dependencies = [
     "resend>=2.22.0",
     "google-genai>=1.65.0",
     "dbt-bigquery>=1.11.1",
+    "sqlfluff>=4.5.0",
 ]
 
 [dependency-groups]
-development = ["ruff>=0.15.17", "pre-commit>=4.6.0"]
+development = [
+    "ruff>=0.15.17",
+    "pre-commit>=4.6.0",
+    "sqlfluff>=4.5.0",
+]
 
 
 [tool.ruff]

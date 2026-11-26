@@ -3,8 +3,8 @@ WITH
         SELECT
 
             _load_timestamp AS utc_loaded_at,
-            Body AS message_body,
-            MessageSid AS message_unique_id
+            body AS message_body,
+            messagesid AS message_unique_id
 
         FROM {{ ref('base__food_journal') }}
         WHERE _load_timestamp IS NOT NULL
@@ -15,17 +15,18 @@ WITH
 
             base.message_unique_id,
             base.utc_loaded_at,
-            DATETIME(base.utc_loaded_at, 'America/New_York') AS est_loaded_at,
-            food_line_item
+            food_line_item,
+            DATETIME(base.utc_loaded_at, 'America/New_York') AS est_loaded_at
 
         FROM base
         CROSS JOIN UNNEST(SPLIT(base.message_body, '*')) AS food_line_item
-        WHERE food_line_item IS NOT NULL
+        WHERE
+            food_line_item IS NOT NULL
             AND TRIM(food_line_item) != ''
     ),
 
     cleaned AS (
-        SELECT 
+        SELECT
 
             DATE(est_loaded_at) AS load_date,
             message_unique_id,
@@ -40,13 +41,13 @@ WITH
                     ]
                 )
             }} AS surrogate_pk
-            
+
         FROM parsed
         WHERE DATE(est_loaded_at) >= '2025-12-01'
     )
 
 SELECT * FROM cleaned
 QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY surrogate_pk 
+    PARTITION BY surrogate_pk
     ORDER BY est_loaded_at DESC
 ) = 1

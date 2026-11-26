@@ -12,4 +12,4 @@ SELECT
         )
     }}
 
-FROM {{ ref("stg__02__workouts")}}
+FROM {{ ref("stg__02__workouts") }}

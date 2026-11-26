@@ -1,0 +1,29 @@
+[sqlfluff]
+dialect = bigquery
+# The jinja templater renders ref()/source()/config() without connecting to
+# BigQuery, which keeps format-on-save fast.
+templater = jinja
+max_line_length = 100
+exclude_rules = LT05
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 4
+indented_ctes = True
+indented_joins = False
+indented_using_on = True
+template_blocks_indent = True
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+load_macros_from_path = macros
+library_path = .sqlfluff_libs
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
