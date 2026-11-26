@@ -4,7 +4,8 @@ dialect = bigquery
 # BigQuery, which keeps format-on-save fast.
 templater = jinja
 max_line_length = 100
-exclude_rules = LT05
+# LT05: long lines; ST07: allow JOIN ... USING (...)
+exclude_rules = LT05, ST07
 
 [sqlfluff:indentation]
 indent_unit = space
